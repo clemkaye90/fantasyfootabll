@@ -10,6 +10,7 @@ from nfl_fantasy_app.data.players import (
     get_player_stats,
     search_players,
 )
+from nfl_fantasy_app.data.fantasypros import FREE_TIER_NOTE, get_api_key, get_fantasypros_projection
 from nfl_fantasy_app.data.projections import get_player_projection
 from nfl_fantasy_app.ui.components import (
     render_comparison_table,
@@ -79,6 +80,32 @@ def _render_projection_section(player_id: str, info: dict) -> None:
     render_stat_table(proj, schema)
 
 
+def _render_fantasypros_section(player_id: str, info: dict) -> None:
+    st.markdown(f"**{config.CURRENT_SEASON} Projected Stats (FantasyPros)**")
+
+    if get_api_key() is None:
+        st.caption(
+            "No FantasyPros API key configured — add one to .streamlit/secrets.toml "
+            "(see .streamlit/secrets.toml.example) to enable this section."
+        )
+        return
+
+    proj = get_fantasypros_projection(player_id, config.CURRENT_SEASON)
+    if proj is None:
+        st.caption(f"No FantasyPros projection found for this player. {FREE_TIER_NOTE}")
+        return
+
+    st.caption(
+        f"Third-party season-long projection from FantasyPros, converted to per-game by "
+        f"dividing by a {config.CURRENT_SEASON} 17-game season. Fantasy points are "
+        "recomputed with this app's own scoring rules from FantasyPros' projected raw "
+        "stats (not FantasyPros' own point total). Yards-after-contact/catch aren't "
+        f"provided by this API. {FREE_TIER_NOTE}"
+    )
+    schema = config.QB_STATS if info["position"] == "QB" else config.SKILL_STATS
+    render_stat_table(proj, schema)
+
+
 def _render_player_card(player_id: str, season: int) -> None:
     info = get_player_info(player_id)
     if info is None:
@@ -99,6 +126,7 @@ def _render_player_card(player_id: str, season: int) -> None:
 
     _render_coaching_section(info["latest_team"])
     _render_projection_section(player_id, info)
+    _render_fantasypros_section(player_id, info)
 
 
 def render_players_tab(mode: str) -> None:
@@ -170,6 +198,21 @@ def render_players_tab(mode: str) -> None:
                     )
                     proj_schema = config.QB_STATS if info_a["position"] == "QB" else config.SKILL_STATS
                     render_comparison_table(proj_a, proj_b, proj_schema, name_a, name_b)
+
+                st.markdown(f"**{config.CURRENT_SEASON} Projected Stats (FantasyPros)**")
+                if get_api_key() is None:
+                    st.caption(
+                        "No FantasyPros API key configured — add one to "
+                        ".streamlit/secrets.toml to enable this section."
+                    )
+                else:
+                    fp_a = get_fantasypros_projection(player_a, config.CURRENT_SEASON)
+                    fp_b = get_fantasypros_projection(player_b, config.CURRENT_SEASON)
+                    if fp_a is None or fp_b is None:
+                        st.caption("No FantasyPros projection found for one or both players.")
+                    else:
+                        fp_schema = config.QB_STATS if info_a["position"] == "QB" else config.SKILL_STATS
+                        render_comparison_table(fp_a, fp_b, fp_schema, name_a, name_b)
         elif player_a:
             _render_player_card(player_a, season)
         elif player_b:

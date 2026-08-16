@@ -83,3 +83,9 @@ def get_schedules(season: int) -> pd.DataFrame:
 @st.cache_data(ttl=24 * 3600, show_spinner="Loading team info...")
 def get_team_desc() -> pd.DataFrame:
     return nfl.import_team_desc()
+
+
+@st.cache_data(ttl=24 * 3600, show_spinner="Loading player ID crosswalk...")
+def get_id_crosswalk() -> pd.DataFrame:
+    """gsis_id <-> other sites' player IDs (e.g. FantasyPros' fantasypros_id)."""
+    return nfl.import_ids(columns=["gsis_id", "fantasypros_id"])
