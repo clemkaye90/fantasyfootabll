@@ -61,6 +61,27 @@ TEAM_STATS = [
     ("Rush Play %", "rush_pct", "{:.0%}"),
 ]
 
+MERGED_PROJECTIONS_NOTE = (
+    "Projected Stats blends three sources: the FantasyPros API, and the CBS "
+    "and Yahoo season-long projection spreadsheets. Each stat below is the "
+    "average of whichever sources have that player, then run through this "
+    "app's own scoring rules — so it isn't any one source's number, and "
+    "coverage (1, 2, or 3 sources) varies by player."
+)
+
+# Raw per-game stat components every projection source is normalized into,
+# before being averaged together in data.blended_projections. Kept separate
+# from the QB_STATS/SKILL_STATS *display* schema below since a source may
+# only have some of these (e.g. Yahoo's export has no pass attempts/
+# completions) — averaging happens on this raw layer, and the display
+# fields (including fantasy_points_pg) are derived only after averaging.
+RAW_PROJECTION_COMPONENTS = [
+    "pass_att_pg", "pass_cmp_pg", "pass_yds_pg", "pass_td_pg", "pass_int_pg",
+    "rush_att_pg", "rush_yds_pg", "rush_td_pg",
+    "rec_pg", "rec_yds_pg", "rec_td_pg",
+    "fumbles_pg",
+]
+
 OL_GRADE_NOTE = (
     "Offensive line grade isn't shown — that stat comes from PFF's proprietary "
     "grading system, which isn't available through nfl_data_py / nflverse's free data."

@@ -10,9 +10,14 @@ Play-by-play (`pbp`) and the PFR advanced-stats releases stay current, so
 they're used as the single source of truth here for both tabs.
 """
 
+import sqlite3
+from pathlib import Path
+
 import pandas as pd
 import streamlit as st
 import nfl_data_py as nfl
+
+EXTERNAL_PROJECTIONS_DB = Path(__file__).parent / "external_projections.db"
 
 PBP_COLUMNS = [
     "season_type", "game_id", "posteam", "defteam", "play_type",
@@ -89,3 +94,16 @@ def get_team_desc() -> pd.DataFrame:
 def get_id_crosswalk() -> pd.DataFrame:
     """gsis_id <-> other sites' player IDs (e.g. FantasyPros' fantasypros_id)."""
     return nfl.import_ids(columns=["gsis_id", "fantasypros_id"])
+
+
+@st.cache_data(ttl=24 * 3600, show_spinner="Loading external projection spreadsheets...")
+def get_external_projections_raw() -> pd.DataFrame:
+    """CBS/Yahoo projection spreadsheets, pre-parsed into a bundled SQLite DB.
+
+    See scripts/ingest_external_projections.py — the source .xlsx files live
+    outside the repo, so this DB is what actually ships/deploys.
+    """
+    if not EXTERNAL_PROJECTIONS_DB.exists():
+        return pd.DataFrame()
+    with sqlite3.connect(EXTERNAL_PROJECTIONS_DB) as conn:
+        return pd.read_sql("SELECT * FROM external_projections", conn)

@@ -3,6 +3,7 @@
 import streamlit as st
 
 from nfl_fantasy_app import config
+from nfl_fantasy_app.data.blended_projections import get_blended_projection
 from nfl_fantasy_app.data.coaching import get_coaching_profile_for_team
 from nfl_fantasy_app.data.players import (
     build_player_season_stats,
@@ -10,8 +11,6 @@ from nfl_fantasy_app.data.players import (
     get_player_stats,
     search_players,
 )
-from nfl_fantasy_app.data.fantasypros import FREE_TIER_NOTE, get_api_key, get_fantasypros_projection
-from nfl_fantasy_app.data.projections import get_player_projection
 from nfl_fantasy_app.ui.components import (
     render_comparison_table,
     render_formation_table,
@@ -64,43 +63,17 @@ def _render_coaching_section(team_abbr: str) -> None:
     render_formation_table(profile["formations"])
 
 
-def _render_projection_section(player_id: str, info: dict) -> None:
-    proj = get_player_projection(player_id)
+def _render_projected_stats_section(player_id: str, info: dict) -> None:
+    st.markdown(f"**{config.CURRENT_SEASON} Projected Stats**")
+
+    proj = get_blended_projection(player_id, config.CURRENT_SEASON)
     if proj is None:
-        st.caption(f"No {config.CURRENT_SEASON} projection available for this player.")
-        return
-
-    st.markdown(f"**{config.CURRENT_SEASON} Projected Stats (scheme-adjusted)**")
-    st.caption(
-        f"{config.BASELINE_SEASON} per-game stats scaled by the incoming coaching "
-        f"tendency vs. {info['latest_team']}'s actual {config.BASELINE_SEASON} tendency "
-        f"(pass volume ×{proj['r_pass']:.2f}, rush volume ×{proj['r_rush']:.2f})."
-    )
-    schema = config.QB_STATS if info["position"] == "QB" else config.SKILL_STATS
-    render_stat_table(proj, schema)
-
-
-def _render_fantasypros_section(player_id: str, info: dict) -> None:
-    st.markdown(f"**{config.CURRENT_SEASON} Projected Stats (FantasyPros)**")
-
-    if get_api_key() is None:
-        st.caption(
-            "No FantasyPros API key configured — add one to .streamlit/secrets.toml "
-            "(see .streamlit/secrets.toml.example) to enable this section."
-        )
-        return
-
-    proj = get_fantasypros_projection(player_id, config.CURRENT_SEASON)
-    if proj is None:
-        st.caption(f"No FantasyPros projection found for this player. {FREE_TIER_NOTE}")
+        st.caption("No projection found for this player in any of the three sources.")
         return
 
     st.caption(
-        f"Third-party season-long projection from FantasyPros, converted to per-game by "
-        f"dividing by a {config.CURRENT_SEASON} 17-game season. Fantasy points are "
-        "recomputed with this app's own scoring rules from FantasyPros' projected raw "
-        "stats (not FantasyPros' own point total). Yards-after-contact/catch aren't "
-        f"provided by this API. {FREE_TIER_NOTE}"
+        f"{config.MERGED_PROJECTIONS_NOTE} This player: {proj['source_count']}/3 sources "
+        f"({', '.join(proj['sources'])})."
     )
     schema = config.QB_STATS if info["position"] == "QB" else config.SKILL_STATS
     render_stat_table(proj, schema)
@@ -125,8 +98,7 @@ def _render_player_card(player_id: str, season: int) -> None:
             st.caption(config.OL_GRADE_NOTE)
 
     _render_coaching_section(info["latest_team"])
-    _render_projection_section(player_id, info)
-    _render_fantasypros_section(player_id, info)
+    _render_projected_stats_section(player_id, info)
 
 
 def render_players_tab(mode: str) -> None:
@@ -136,7 +108,7 @@ def render_players_tab(mode: str) -> None:
         st.info(
             f"The {season} regular season hasn't started yet — per-game stats aren't "
             "available for it, but you can still search players below for their "
-            "Coaching tendencies (always sourced from the baseline season)."
+            "Coaching tendencies and Projected Stats (both independent of this toggle)."
         )
 
     compare = st.toggle("Compare two players", value=False)
@@ -187,32 +159,19 @@ def render_players_tab(mode: str) -> None:
                 with coach_col_b:
                     _render_coaching_section(info_b["latest_team"])
 
-                proj_a = get_player_projection(player_a)
-                proj_b = get_player_projection(player_b)
-                if proj_a is not None and proj_b is not None:
-                    st.markdown(f"**{config.CURRENT_SEASON} Projected Stats (scheme-adjusted)**")
+                st.markdown(f"**{config.CURRENT_SEASON} Projected Stats**")
+                proj_a = get_blended_projection(player_a, config.CURRENT_SEASON)
+                proj_b = get_blended_projection(player_b, config.CURRENT_SEASON)
+                if proj_a is None or proj_b is None:
+                    st.caption("No projection found for one or both players in any of the three sources.")
+                else:
                     st.caption(
-                        f"Multipliers vs. {config.BASELINE_SEASON} — "
-                        f"{name_a}: pass ×{proj_a['r_pass']:.2f}, rush ×{proj_a['r_rush']:.2f}  |  "
-                        f"{name_b}: pass ×{proj_b['r_pass']:.2f}, rush ×{proj_b['r_rush']:.2f}"
+                        f"{config.MERGED_PROJECTIONS_NOTE} "
+                        f"{name_a}: {proj_a['source_count']}/3 sources ({', '.join(proj_a['sources'])})  |  "
+                        f"{name_b}: {proj_b['source_count']}/3 sources ({', '.join(proj_b['sources'])})"
                     )
                     proj_schema = config.QB_STATS if info_a["position"] == "QB" else config.SKILL_STATS
                     render_comparison_table(proj_a, proj_b, proj_schema, name_a, name_b)
-
-                st.markdown(f"**{config.CURRENT_SEASON} Projected Stats (FantasyPros)**")
-                if get_api_key() is None:
-                    st.caption(
-                        "No FantasyPros API key configured — add one to "
-                        ".streamlit/secrets.toml to enable this section."
-                    )
-                else:
-                    fp_a = get_fantasypros_projection(player_a, config.CURRENT_SEASON)
-                    fp_b = get_fantasypros_projection(player_b, config.CURRENT_SEASON)
-                    if fp_a is None or fp_b is None:
-                        st.caption("No FantasyPros projection found for one or both players.")
-                    else:
-                        fp_schema = config.QB_STATS if info_a["position"] == "QB" else config.SKILL_STATS
-                        render_comparison_table(fp_a, fp_b, fp_schema, name_a, name_b)
         elif player_a:
             _render_player_card(player_a, season)
         elif player_b:
