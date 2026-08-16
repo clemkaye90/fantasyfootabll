@@ -18,6 +18,7 @@ import streamlit as st
 import nfl_data_py as nfl
 
 EXTERNAL_PROJECTIONS_DB = Path(__file__).parent / "external_projections.db"
+OFFENSIVE_LINE_RANKINGS_DB = Path(__file__).parent / "offensive_line_rankings.db"
 
 PBP_COLUMNS = [
     "season_type", "game_id", "posteam", "defteam", "play_type",
@@ -107,3 +108,16 @@ def get_external_projections_raw() -> pd.DataFrame:
         return pd.DataFrame()
     with sqlite3.connect(EXTERNAL_PROJECTIONS_DB) as conn:
         return pd.read_sql("SELECT * FROM external_projections", conn)
+
+
+@st.cache_data(ttl=24 * 3600, show_spinner="Loading offensive line rankings...")
+def get_offensive_line_rankings_raw() -> pd.DataFrame:
+    """PFF/FTN/PFN offensive line rankings, pre-parsed into a bundled SQLite DB.
+
+    See scripts/ingest_offensive_line_rankings.py for the sourcing and why
+    this is a static snapshot rather than a live fetch.
+    """
+    if not OFFENSIVE_LINE_RANKINGS_DB.exists():
+        return pd.DataFrame()
+    with sqlite3.connect(OFFENSIVE_LINE_RANKINGS_DB) as conn:
+        return pd.read_sql("SELECT * FROM offensive_line_rankings", conn)
