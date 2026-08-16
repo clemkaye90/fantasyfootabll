@@ -1,0 +1,20 @@
+[project]
+name = "nfl-fantasy-app"
+version = "0.1.0"
+description = "Streamlit app for NFL fantasy player/team/coaching stats, powered by nflverse data"
+readme = "README.md"
+authors = [
+    { name = "Clem Kaye", email = "clemkaye90@gmail.com" }
+]
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "nfl-data-py>=0.3.3",
+    "pandas>=1.5.3",
+    "plotly>=6.9.0",
+    "pyarrow>=25.0.1",
+    "streamlit>=1.59.1",
+]
+
+[build-system]
+requires = ["uv_build>=0.12.3,<0.13.0"]
+build-backend = "uv_build"
