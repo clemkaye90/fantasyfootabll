@@ -91,7 +91,9 @@ OL_GRADE_NOTE = (
 
 # --- Coaching table -----------------------------------------------------
 # nfl_data_py/nflverse has no coaching-staff data, so this mapping is
-# hand-maintained (user-supplied, August 2026) rather than pulled live.
+# hand-maintained rather than pulled live. Cross-referenced against
+# Wikipedia's "List of current NFL offensive coordinators" (August 2026):
+# https://en.wikipedia.org/wiki/List_of_current_NFL_offensive_coordinators
 # Update it here if a team changes its offensive play-caller.
 TEAM_OC_2026 = {
     "BUF": "Pete Carmichael",
@@ -114,7 +116,7 @@ TEAM_OC_2026 = {
     "NYG": "Matt Nagy",
     "PHI": "Sean Mannion",
     "WAS": "David Blough",
-    "CHI": "Ben Johnson",
+    "CHI": "Press Taylor",
     "DET": "Drew Petzing",
     "GB": "Adam Stenavich",
     "MIN": "Wes Phillips",
@@ -123,23 +125,27 @@ TEAM_OC_2026 = {
     "NO": "Doug Nussmeier",
     "TB": "Zac Robinson",
     "ARI": "Nathaniel Hackett",
-    "LA": "Nate Scheelhaase",
+    "LA": "Nathan Scheelhaase",
     "SF": "Klay Kubiak",
     "SEA": "Brian Fleury",
 }
 
 # OC name -> the team whose 2025 offense they actually called plays for,
 # only needed when that differs from their 2026 team above (e.g. a new hire
-# who ran a different team's offense last season). User-supplied, August 2026.
-# Any OC not listed here falls back to their own 2026 team's 2025 tendencies
-# (i.e. no scheme change / internal promotion).
+# who ran a different team's offense last season). Derived from Wikipedia's
+# "Since"/"Previous position" columns: only OCs whose tenure at their 2026
+# team began in 2026 (i.e. actually a new hire there this year) get an
+# entry here, pointing at whatever NFL team their prior role was with. An
+# OC who has been at their 2026 team since 2025 or earlier already called
+# that team's own 2025 offense, so they're excluded even if they moved
+# teams the year before; likewise an OC promoted internally (their prior
+# role was with the same 2026 team) has no scheme change to reflect.
+# Any OC not listed here falls back to their own 2026 team's 2025 tendencies.
 OC_PRIOR_TEAM_2025: dict[str, str] = {
     "Pete Carmichael": "DEN",
     "Declan Doyle": "CHI",
     "Travis Switzer": "BAL",
     "Brian Angelichio": "MIN",
-    "Nick Caley": "LA",
-    "Grant Udinski": "MIN",
     "Brian Daboll": "NYG",
     "Eric Bieniemy": "CHI",
     "Andrew Janocko": "SEA",
@@ -148,9 +154,9 @@ OC_PRIOR_TEAM_2025: dict[str, str] = {
     "Sean Mannion": "GB",
     "Drew Petzing": "ARI",
     "Tommy Rees": "CLE",
-    "Doug Nussmeier": "PHI",
     "Zac Robinson": "ATL",
     "Nathaniel Hackett": "GB",
+    "Brian Fleury": "SF",
 }
 
 COACHING_STATS = [
