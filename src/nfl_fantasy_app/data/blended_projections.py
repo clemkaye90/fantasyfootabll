@@ -1,13 +1,14 @@
-"""2026 Projected Stats: the average of three independent projection sources.
+"""2026 Projected Stats: the average of four independent projection sources.
 
-Each source (FantasyPros API, CBS spreadsheet, Yahoo spreadsheet) is
-normalized to the same per-game raw-stat schema (config.RAW_PROJECTION_
-COMPONENTS) in its own module, then simply averaged here — per player, per
-stat, across whichever sources actually have that player (a source missing
-a player, or missing one specific stat like Yahoo's passing attempts, is
-excluded from that particular average rather than treated as a zero).
-Fantasy points are computed once, from the averaged components, using this
-app's own scoring rules — not averaged from each source's own point total.
+Each source (FantasyPros API, CBS spreadsheet, Yahoo spreadsheet, ESPN's
+Mike Clay guide) is normalized to the same per-game raw-stat schema
+(config.RAW_PROJECTION_COMPONENTS) in its own module, then simply averaged
+here — per player, per stat, across whichever sources actually have that
+player (a source missing a player, or missing one specific stat like
+Yahoo's passing attempts or ESPN's fumbles, is excluded from that
+particular average rather than treated as a zero). Fantasy points are
+computed once, from the averaged components, using this app's own scoring
+rules — not averaged from each source's own point total.
 """
 
 import numpy as np
@@ -28,6 +29,7 @@ def build_blended_projections(season: int) -> pd.DataFrame:
         "FantasyPros": build_fantasypros_components(season),
         "CBS": build_source_components("CBS"),
         "Yahoo": build_source_components("Yahoo"),
+        "ESPN": build_source_components("ESPN"),
     }
 
     frames = []
@@ -62,7 +64,7 @@ def build_blended_projections(season: int) -> pd.DataFrame:
     merged["receptions_pg"] = merged["rec_pg"]
     merged["rec_yards_pg"] = merged["rec_yds_pg"]
 
-    # None of the three sources provide yards-after-contact/catch splits
+    # None of the four sources provide yards-after-contact/catch splits
     merged["yac_contact_pg"] = np.nan
     merged["yac_catch_pg"] = np.nan
 

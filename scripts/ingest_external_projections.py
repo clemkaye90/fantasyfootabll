@@ -11,60 +11,16 @@ source .xlsx files live outside the repo (on the developer's Desktop) and
 wouldn't exist on Streamlit Community Cloud's filesystem. Parsing once and
 committing a small SQLite file makes the data travel with the repo like
 everything else the app depends on.
+
+Only touches the "CBS" and "Yahoo" source rows — see scripts/_shared.py.
 """
 
-import difflib
-import re
-import sqlite3
-from pathlib import Path
-
 import openpyxl
-import nfl_data_py as nfl
-import pandas as pd
+
+from _shared import name_matcher, write_rows
 
 CBS_PATH = r"C:\Users\ckwon\Desktop\Clem\Gen Academy\CBS Projected Stats.xlsx"
 YAHOO_PATH = r"C:\Users\ckwon\Desktop\Clem\Gen Academy\Yahoo Projected Rankings.xlsx"
-DB_PATH = Path(__file__).parent.parent / "src" / "nfl_fantasy_app" / "data" / "external_projections.db"
-
-# Columns match this app's internal per-game schema naming, but hold raw
-# season totals here — data/blended_projections.py divides by each row's
-# own `games` count.
-COLUMNS = [
-    "source", "gsis_id", "name", "games",
-    "pass_att", "pass_cmp", "pass_yds", "pass_td", "pass_int",
-    "rush_att", "rush_yds", "rush_td",
-    "rec", "rec_yds", "rec_td",
-    "fumbles_lost",
-]
-
-
-def _name_matcher():
-    roster = nfl.import_players()
-    roster = roster[roster["position"].isin(["QB", "RB", "WR", "TE"])]
-    roster_names = list(roster["display_name"])
-    roster_set = set(roster_names)
-    name_to_gsis = dict(zip(roster["display_name"], roster["gsis_id"]))
-
-    suffix_re = re.compile(r"\s+(Jr\.?|Sr\.?|II|III|IV|V)$", re.IGNORECASE)
-
-    def strip_suffix(n):
-        return suffix_re.sub("", n).strip()
-
-    norm_map: dict[str, list[str]] = {}
-    for n in roster_names:
-        norm_map.setdefault(strip_suffix(n), []).append(n)
-
-    def match(name: str) -> str | None:
-        if name in roster_set:
-            return name_to_gsis[name]
-        stripped = strip_suffix(name)
-        candidates = norm_map.get(stripped)
-        if candidates and len(candidates) == 1:
-            return name_to_gsis[candidates[0]]
-        close = difflib.get_close_matches(name, roster_names, n=1, cutoff=0.87)
-        return name_to_gsis[close[0]] if close else None
-
-    return match
 
 
 def _parse_cbs(match_name) -> list[dict]:
@@ -130,15 +86,9 @@ def _parse_yahoo(match_name) -> list[dict]:
 
 
 def main() -> None:
-    match_name = _name_matcher()
+    match_name = name_matcher()
     rows = _parse_cbs(match_name) + _parse_yahoo(match_name)
-    df = pd.DataFrame(rows, columns=COLUMNS)
-
-    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with sqlite3.connect(DB_PATH) as conn:
-        df.to_sql("external_projections", conn, if_exists="replace", index=False)
-
-    print(f"Wrote {len(df)} rows ({df['source'].value_counts().to_dict()}) to {DB_PATH}")
+    write_rows(rows, sources=["CBS", "Yahoo"])
 
 
 if __name__ == "__main__":

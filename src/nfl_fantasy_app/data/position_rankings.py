@@ -2,13 +2,13 @@
 
 Structured around the four offensive position groups — RB, WR, TE, QB —
 since fantasy rank is only meaningful relative to same-position players,
-never across positions. For each of the three projection sources
-(FantasyPros, CBS, Yahoo) independently: compute that source's own
+never across positions. For each of the four projection sources
+(FantasyPros, CBS, Yahoo, ESPN) independently: compute that source's own
 fantasy_points_pg, then rank players within their position group by it.
 A player's final label (e.g. "RB3") comes from re-ranking players within
-their position by the *average* of however many of those three per-source
+their position by the *average* of however many of those four per-source
 ranks they have; the standard deviation of those same per-source ranks
-shows how much the three sources agree on that placement.
+shows how much the sources agree on that placement.
 """
 
 import pandas as pd
@@ -40,6 +40,7 @@ def build_position_rankings(season: int) -> pd.DataFrame:
         "FantasyPros": build_fantasypros_components(season),
         "CBS": build_source_components("CBS"),
         "Yahoo": build_source_components("Yahoo"),
+        "ESPN": build_source_components("ESPN"),
     }
 
     rank_columns = []

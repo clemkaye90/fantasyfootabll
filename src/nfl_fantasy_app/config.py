@@ -61,12 +61,14 @@ TEAM_STATS = [
     ("Rush Play %", "rush_pct", "{:.0%}"),
 ]
 
+PROJECTION_SOURCE_COUNT = 4
+
 MERGED_PROJECTIONS_NOTE = (
-    "Projected Stats blends three sources: the FantasyPros API, and the CBS "
-    "and Yahoo season-long projection spreadsheets. Each stat below is the "
-    "average of whichever sources have that player, then run through this "
-    "app's own scoring rules — so it isn't any one source's number, and "
-    "coverage (1, 2, or 3 sources) varies by player."
+    "Projected Stats blends four sources: the FantasyPros API, the CBS and "
+    "Yahoo season-long projection spreadsheets, and ESPN's Mike Clay guide. "
+    "Each stat below is the average of whichever sources have that player, "
+    "then run through this app's own scoring rules — so it isn't any one "
+    "source's number, and coverage (1 to 4 sources) varies by player."
 )
 
 # Raw per-game stat components every projection source is normalized into,

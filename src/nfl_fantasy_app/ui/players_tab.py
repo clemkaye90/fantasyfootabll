@@ -66,14 +66,14 @@ def _render_coaching_section(team_abbr: str) -> None:
 
 
 def _position_rank_line(player_id: str) -> str | None:
-    """'**Position Rank: RB3**  —  avg rank 2.7 (σ 1.2) across 3/3 sources', or None."""
+    """'**Position Rank: RB3**  —  avg rank 2.7 (σ 1.2) across 4/4 sources', or None."""
     rank = get_position_ranking(player_id, config.CURRENT_SEASON)
     if rank is None:
         return None
     stdev = "n/a" if pd.isna(rank["rank_stdev"]) else f"{rank['rank_stdev']:.1f}"
     return (
         f"**Position Rank: {rank['label']}**  —  avg rank {rank['avg_rank']:.1f} "
-        f"(σ {stdev}) across {rank['source_count']}/3 sources"
+        f"(σ {stdev}) across {rank['source_count']}/{config.PROJECTION_SOURCE_COUNT} sources"
     )
 
 
@@ -82,7 +82,7 @@ def _render_projected_stats_section(player_id: str, info: dict) -> None:
 
     proj = get_blended_projection(player_id, config.CURRENT_SEASON)
     if proj is None:
-        st.caption("No projection found for this player in any of the three sources.")
+        st.caption("No projection found for this player in any of the four sources.")
         return
 
     rank_line = _position_rank_line(player_id)
@@ -90,7 +90,8 @@ def _render_projected_stats_section(player_id: str, info: dict) -> None:
         st.markdown(rank_line)
 
     st.caption(
-        f"{config.MERGED_PROJECTIONS_NOTE} This player: {proj['source_count']}/3 sources "
+        f"{config.MERGED_PROJECTIONS_NOTE} This player: "
+        f"{proj['source_count']}/{config.PROJECTION_SOURCE_COUNT} sources "
         f"({', '.join(proj['sources'])})."
     )
     schema = config.QB_STATS if info["position"] == "QB" else config.SKILL_STATS
@@ -181,7 +182,7 @@ def render_players_tab(mode: str) -> None:
                 proj_a = get_blended_projection(player_a, config.CURRENT_SEASON)
                 proj_b = get_blended_projection(player_b, config.CURRENT_SEASON)
                 if proj_a is None or proj_b is None:
-                    st.caption("No projection found for one or both players in any of the three sources.")
+                    st.caption("No projection found for one or both players in any of the four sources.")
                 else:
                     rank_col_a, rank_col_b = st.columns(2)
                     with rank_col_a:
@@ -193,10 +194,11 @@ def render_players_tab(mode: str) -> None:
                         if rank_line_b:
                             st.markdown(rank_line_b)
 
+                    n = config.PROJECTION_SOURCE_COUNT
                     st.caption(
                         f"{config.MERGED_PROJECTIONS_NOTE} "
-                        f"{name_a}: {proj_a['source_count']}/3 sources ({', '.join(proj_a['sources'])})  |  "
-                        f"{name_b}: {proj_b['source_count']}/3 sources ({', '.join(proj_b['sources'])})"
+                        f"{name_a}: {proj_a['source_count']}/{n} sources ({', '.join(proj_a['sources'])})  |  "
+                        f"{name_b}: {proj_b['source_count']}/{n} sources ({', '.join(proj_b['sources'])})"
                     )
                     proj_schema = config.QB_STATS if info_a["position"] == "QB" else config.SKILL_STATS
                     render_comparison_table(proj_a, proj_b, proj_schema, name_a, name_b)
