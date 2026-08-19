@@ -18,6 +18,7 @@ from nfl_fantasy_app import config
 from nfl_fantasy_app.data.external_sources import build_source_components
 from nfl_fantasy_app.data.fantasypros import build_fantasypros_components
 from nfl_fantasy_app.data.loader import get_players
+from nfl_fantasy_app.data.scoring import compute_fantasy_points_pg
 
 
 @st.cache_data(ttl=6 * 3600, show_spinner="Blending projection sources...")
@@ -70,21 +71,7 @@ def build_blended_projections(season: int) -> pd.DataFrame:
     rec_td_pg = merged["rec_td_pg"].fillna(0)
     merged["total_td_pg"] = np.where(is_qb, pass_td_pg + rush_td_pg, rush_td_pg + rec_td_pg)
 
-    qb_points = (
-        merged["pass_yards_pg"] * config.FANTASY_POINTS_PER_PASS_YARD
-        + merged["rush_yards_pg"] * config.FANTASY_POINTS_PER_RUSH_REC_YARD
-        + pass_td_pg * config.FANTASY_POINTS_PER_PASSING_TD
-        + rush_td_pg * config.FANTASY_POINTS_PER_RUSH_REC_TD
-        + merged["fumbles_pg"] * config.FANTASY_POINTS_PER_FUMBLE
-        + merged["interceptions_pg"] * config.FANTASY_POINTS_PER_INTERCEPTION
-    )
-    skill_points = (
-        (merged["rush_yards_pg"] + merged["rec_yards_pg"]) * config.FANTASY_POINTS_PER_RUSH_REC_YARD
-        + (rush_td_pg + rec_td_pg) * config.FANTASY_POINTS_PER_RUSH_REC_TD
-        + merged["receptions_pg"] * config.FANTASY_POINTS_PER_RECEPTION
-        + merged["fumbles_pg"] * config.FANTASY_POINTS_PER_FUMBLE
-    )
-    merged["fantasy_points_pg"] = np.where(is_qb, qb_points, skill_points)
+    merged["fantasy_points_pg"] = compute_fantasy_points_pg(merged, is_qb)
 
     return merged
 

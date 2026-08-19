@@ -1,10 +1,12 @@
 """Players tab: search, single player card, and side-by-side comparison."""
 
+import pandas as pd
 import streamlit as st
 
 from nfl_fantasy_app import config
 from nfl_fantasy_app.data.blended_projections import get_blended_projection
 from nfl_fantasy_app.data.coaching import get_coaching_profile_for_team
+from nfl_fantasy_app.data.position_rankings import get_position_ranking
 from nfl_fantasy_app.data.players import (
     build_player_season_stats,
     get_player_info,
@@ -63,6 +65,18 @@ def _render_coaching_section(team_abbr: str) -> None:
     render_formation_table(profile["formations"])
 
 
+def _position_rank_line(player_id: str) -> str | None:
+    """'**Position Rank: RB3**  —  avg rank 2.7 (σ 1.2) across 3/3 sources', or None."""
+    rank = get_position_ranking(player_id, config.CURRENT_SEASON)
+    if rank is None:
+        return None
+    stdev = "n/a" if pd.isna(rank["rank_stdev"]) else f"{rank['rank_stdev']:.1f}"
+    return (
+        f"**Position Rank: {rank['label']}**  —  avg rank {rank['avg_rank']:.1f} "
+        f"(σ {stdev}) across {rank['source_count']}/3 sources"
+    )
+
+
 def _render_projected_stats_section(player_id: str, info: dict) -> None:
     st.markdown(f"**{config.CURRENT_SEASON} Projected Stats**")
 
@@ -70,6 +84,10 @@ def _render_projected_stats_section(player_id: str, info: dict) -> None:
     if proj is None:
         st.caption("No projection found for this player in any of the three sources.")
         return
+
+    rank_line = _position_rank_line(player_id)
+    if rank_line:
+        st.markdown(rank_line)
 
     st.caption(
         f"{config.MERGED_PROJECTIONS_NOTE} This player: {proj['source_count']}/3 sources "
@@ -165,6 +183,16 @@ def render_players_tab(mode: str) -> None:
                 if proj_a is None or proj_b is None:
                     st.caption("No projection found for one or both players in any of the three sources.")
                 else:
+                    rank_col_a, rank_col_b = st.columns(2)
+                    with rank_col_a:
+                        rank_line_a = _position_rank_line(player_a)
+                        if rank_line_a:
+                            st.markdown(rank_line_a)
+                    with rank_col_b:
+                        rank_line_b = _position_rank_line(player_b)
+                        if rank_line_b:
+                            st.markdown(rank_line_b)
+
                     st.caption(
                         f"{config.MERGED_PROJECTIONS_NOTE} "
                         f"{name_a}: {proj_a['source_count']}/3 sources ({', '.join(proj_a['sources'])})  |  "
