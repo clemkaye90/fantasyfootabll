@@ -14,12 +14,17 @@ shows how much the sources agree on that placement.
 import pandas as pd
 import streamlit as st
 
+from nfl_fantasy_app.data.blended_projections import build_blended_projections
 from nfl_fantasy_app.data.external_sources import build_source_components
 from nfl_fantasy_app.data.fantasypros import build_fantasypros_components
 from nfl_fantasy_app.data.loader import get_players
 from nfl_fantasy_app.data.scoring import compute_fantasy_points_pg
 
 POSITIONS = ["QB", "RB", "WR", "TE"]
+
+LEADERBOARD_PROJECTION_COLUMNS = [
+    "rush_yards_pg", "rec_yards_pg", "receptions_pg", "total_td_pg", "fantasy_points_pg",
+]
 
 
 def _source_position_ranks(components: pd.DataFrame, players: pd.DataFrame) -> pd.Series:
@@ -71,3 +76,20 @@ def get_position_ranking(player_id: str, season: int) -> dict | None:
     if rankings.empty or player_id not in rankings.index:
         return None
     return rankings.loc[player_id].to_dict()
+
+
+def build_position_leaderboard(position: str, season: int) -> pd.DataFrame:
+    """Every ranked player at `position`, one row each, sorted by avg_rank (best first)."""
+    rankings = build_position_rankings(season)
+    if rankings.empty:
+        return pd.DataFrame()
+    pos_rankings = rankings[rankings["position"] == position]
+    if pos_rankings.empty:
+        return pd.DataFrame()
+
+    projections = build_blended_projections(season)
+    players = get_players().set_index("gsis_id")[["display_name", "latest_team"]]
+
+    merged = pos_rankings.join(projections[LEADERBOARD_PROJECTION_COLUMNS], how="left")
+    merged = merged.join(players, how="left")
+    return merged.sort_values("avg_rank")

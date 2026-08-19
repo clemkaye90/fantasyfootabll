@@ -159,3 +159,19 @@ COACHING_STATS = [
     ("Passing TD / Game", "passing_td_pg", "{:.2f}"),
     ("Rushing TD / Game", "rushing_td_pg", "{:.2f}"),
 ]
+
+# --- Rankings tab: full position leaderboards ---------------------------
+# (data key, column header, printf-style number format or None for text)
+LEADERBOARD_STATS = [
+    ("label", "Rank", None),
+    ("display_name", "Player", None),
+    ("latest_team", "Team", None),
+    ("avg_rank", "Avg Rank", "%.1f"),
+    ("rank_stdev", "Rank σ", "%.1f"),
+    ("source_count", "Sources", "%d"),
+    ("rush_yards_pg", "Rush Yds/G", "%.1f"),
+    ("rec_yards_pg", "Rec Yds/G", "%.1f"),
+    ("receptions_pg", "Rec/G", "%.1f"),
+    ("total_td_pg", "TD/G", "%.2f"),
+    ("fantasy_points_pg", "Fantasy Pts/G", "%.1f"),
+]

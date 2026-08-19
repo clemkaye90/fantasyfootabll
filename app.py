@@ -4,6 +4,7 @@ from nfl_fantasy_app import config
 from nfl_fantasy_app.ui.coaches_tab import render_coaches_tab
 from nfl_fantasy_app.ui.offensive_line_tab import render_offensive_line_tab
 from nfl_fantasy_app.ui.players_tab import render_players_tab
+from nfl_fantasy_app.ui.rankings_tab import render_rankings_tab
 from nfl_fantasy_app.ui.teams_tab import render_teams_tab
 
 st.set_page_config(page_title="NFL Fantasy Stats", page_icon="🏈", layout="wide")
@@ -17,7 +18,9 @@ mode_label = st.radio(
     horizontal=True,
 )
 
-players_tab, teams_tab, coaches_tab, ol_tab = st.tabs(["Players", "Teams", "Coaches", "Offensive Line"])
+players_tab, teams_tab, coaches_tab, ol_tab, rankings_tab = st.tabs(
+    ["Players", "Teams", "Coaches", "Offensive Line", "Rankings"]
+)
 
 with players_tab:
     render_players_tab(mode_label)
@@ -30,3 +33,6 @@ with coaches_tab:
 
 with ol_tab:
     render_offensive_line_tab()
+
+with rankings_tab:
+    render_rankings_tab()

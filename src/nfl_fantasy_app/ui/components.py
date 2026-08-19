@@ -55,6 +55,25 @@ def render_comparison_table(
     st.dataframe(df.style.apply(highlight, axis=1), hide_index=True, width="stretch")
 
 
+def render_leaderboard_table(df: pd.DataFrame, schema: list[tuple[str, str, str | None]]) -> None:
+    """Render a full multi-row table (one row per player), sorted as given."""
+    keys = [key for key, _, _ in schema]
+    column_config = {
+        key: (
+            st.column_config.TextColumn(label)
+            if fmt is None
+            else st.column_config.NumberColumn(label, format=fmt)
+        )
+        for key, label, fmt in schema
+    }
+    st.dataframe(
+        df[keys],
+        hide_index=True,
+        width="stretch",
+        column_config=column_config,
+    )
+
+
 def render_formation_table(formations: list[tuple[str, float]]) -> None:
     """Render a Formation | Play % table."""
     rows = [{"Formation": label, "Play %": f"{pct:.0%}"} for label, pct in formations]
