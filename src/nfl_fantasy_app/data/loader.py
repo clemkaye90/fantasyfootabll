@@ -19,6 +19,9 @@ import nfl_data_py as nfl
 
 EXTERNAL_PROJECTIONS_DB = Path(__file__).parent / "external_projections.db"
 OFFENSIVE_LINE_RANKINGS_DB = Path(__file__).parent / "offensive_line_rankings.db"
+DRAFT_STRATEGY_ARTICLES_DB = Path(__file__).parent / "draft_strategy_articles.db"
+INJURY_REPORTS_DB = Path(__file__).parent / "injury_reports.db"
+PLAYER_NEWS_DB = Path(__file__).parent / "player_news.db"
 
 PBP_COLUMNS = [
     "season_type", "game_id", "posteam", "defteam", "play_type",
@@ -121,3 +124,49 @@ def get_offensive_line_rankings_raw() -> pd.DataFrame:
         return pd.DataFrame()
     with sqlite3.connect(OFFENSIVE_LINE_RANKINGS_DB) as conn:
         return pd.read_sql("SELECT * FROM offensive_line_rankings", conn)
+
+
+@st.cache_data(ttl=24 * 3600, show_spinner="Loading draft strategy articles...")
+def get_draft_strategy_articles_raw() -> pd.DataFrame:
+    """Draft strategy article corpus, pre-parsed into a bundled SQLite DB.
+
+    Backs the Week 2 RAG draft-assistant chatbot. See
+    scripts/ingest_draft_strategy_articles.py for sourcing, and
+    scripts/export_draft_strategy_corpus.py to regenerate the markdown
+    files uploaded to the Lyzr knowledge base.
+    """
+    if not DRAFT_STRATEGY_ARTICLES_DB.exists():
+        return pd.DataFrame()
+    with sqlite3.connect(DRAFT_STRATEGY_ARTICLES_DB) as conn:
+        return pd.read_sql("SELECT * FROM draft_strategy_articles", conn)
+
+
+@st.cache_data(ttl=6 * 3600, show_spinner="Loading injury reports...")
+def get_injury_reports_raw() -> pd.DataFrame:
+    """QB/RB/WR/TE injury report snapshot, pre-parsed into a bundled SQLite DB.
+
+    Highly time-sensitive compared to the other bundled sources — see
+    scripts/ingest_injury_reports.py for the refresh cadence this needs,
+    and scripts/export_injury_reports_corpus.py to regenerate the markdown
+    files uploaded to the Lyzr knowledge base.
+    """
+    if not INJURY_REPORTS_DB.exists():
+        return pd.DataFrame()
+    with sqlite3.connect(INJURY_REPORTS_DB) as conn:
+        return pd.read_sql("SELECT * FROM injury_reports", conn)
+
+
+@st.cache_data(ttl=3 * 3600, show_spinner="Loading player news...")
+def get_player_news_raw() -> pd.DataFrame:
+    """Player news snapshot (top-N ranked players only), pre-parsed into a
+    bundled SQLite DB.
+
+    The most time-sensitive of the bundled sources — see
+    scripts/ingest_player_news.py for scope/refresh cadence, and
+    scripts/export_player_news_corpus.py to regenerate the markdown files
+    uploaded to the Lyzr knowledge base.
+    """
+    if not PLAYER_NEWS_DB.exists():
+        return pd.DataFrame()
+    with sqlite3.connect(PLAYER_NEWS_DB) as conn:
+        return pd.read_sql("SELECT * FROM player_news", conn)

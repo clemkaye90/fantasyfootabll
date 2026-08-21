@@ -2,6 +2,7 @@ import streamlit as st
 
 from nfl_fantasy_app import config
 from nfl_fantasy_app.ui.coaches_tab import render_coaches_tab
+from nfl_fantasy_app.ui.draft_assistant_tab import render_draft_assistant_tab
 from nfl_fantasy_app.ui.offensive_line_tab import render_offensive_line_tab
 from nfl_fantasy_app.ui.players_tab import render_players_tab
 from nfl_fantasy_app.ui.rankings_tab import render_rankings_tab
@@ -18,9 +19,12 @@ mode_label = st.radio(
     horizontal=True,
 )
 
-players_tab, teams_tab, coaches_tab, ol_tab, rankings_tab = st.tabs(
-    ["Players", "Teams", "Coaches", "Offensive Line", "Rankings"]
+draft_assistant_tab, players_tab, teams_tab, coaches_tab, ol_tab, rankings_tab = st.tabs(
+    ["Draft Assistant", "Players", "Teams", "Coaches", "Offensive Line", "Rankings"]
 )
+
+with draft_assistant_tab:
+    render_draft_assistant_tab()
 
 with players_tab:
     render_players_tab(mode_label)
