@@ -10,7 +10,11 @@ import requests
 import streamlit as st
 
 API_URL = "https://agent-prod.studio.lyzr.ai/v3/inference/chat/"
-TIMEOUT_SECONDS = 30
+# The agent has been observed taking 30+ seconds to respond (see the Lyzr
+# build plan's own latency goal, which this exceeds) -- 30s was cutting it
+# too close and causing spurious timeouts. Raised for headroom; the real
+# fix is investigating why the agent itself is this slow (see below).
+TIMEOUT_SECONDS = 60
 
 # Lyzr's response field name wasn't confirmed against a live call yet -- try
 # the common candidates in order and fall back to showing the raw payload,
