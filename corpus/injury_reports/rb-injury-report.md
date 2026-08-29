@@ -2,56 +2,62 @@
 title: RB Injury Report
 source: FantasyPros Injury News
 position: RB
-as_of: 2026-08-20
+as_of: 2026-08-25
 url: https://www.fantasypros.com/nfl/injury-news.php?position=RB
 ---
 
-# RB Injury Report (as of 2026-08-20)
+# RB Injury Report (as of 2026-08-25)
 
 This report is time-sensitive. Treat any player not listed here as having no known injury concern as of the date above, and note that status can change day to day during camp and week to week during the season.
 
-**Quinshon Judkins** (CLE, RB) — Status: Day-to-day. Injury: Minor issue. Fantasy impact: Missed Wednesday practice; remained day-to-day after missing Thursday as well. (Updated 2026-08-20)
+**Quinshon Judkins** (CLE, RB) — Status: Returned to team drills. Injury: Not specified. Fantasy impact: Judkins missed two practices last week and was limited to individual work on Monday. He was back full-go on Tuesday.. (Updated 2026-08-25)
 
-**Rachaad White** (WAS, RB) — Status: Out (Sat game). Injury: Hamstring. Fantasy impact: Will skip Saturday's preseason matchup; HC notes he is 'certainly close' to returning. (Updated 2026-08-20)
+**TreVeyon Henderson** (NE, RB) — Status: Not practicing Tuesday. Injury: Ankle. Fantasy impact: Henderson is expected to be a non-participant at New England's practice on Tuesday due to the ankle injury that he suffered on Monday. It's not expected to be a serious issue, but this is a situation worth monitoring for fantasy managers over the next couple of weeks.. (Updated 2026-08-25)
 
-**DJ Giddens** (IND, RB) — Status: Day-to-day. Injury: Hamstring. Fantasy impact: Exited early Wednesday; appears to have reaggravated previous hamstring strain. (Updated 2026-08-19)
+**Kenneth Walker III** (KC, RB) — Status: Not practicing Tuesday. Injury: Foot. Fantasy impact: It is unclear how serious the injury is for Walker. His status will need to be monitored in practice the rest of the week.. (Updated 2026-08-25)
 
-**Tank Bigsby** (PHI, RB) — Status: Active. Injury: Toe. Fantasy impact: Returned to practice Wednesday; backing up Saquon Barkley to open season. (Updated 2026-08-19)
+**Ty Johnson** (BUF, RB) — Status: Progressing with recovery. Injury: Leg. Fantasy impact: Johnson was technically a non-participant at Buffalo's practice on Tuesday, but he seems to be progressing well with his recovery and has resumed running. The team isn't certain whether or not he will be ready for Week 1 at this point, but his status doesn't have much of an impact for fantasy purposes.. (Updated 2026-08-25)
 
-**Tony Pollard** (TEN, RB) — Status: Active. Injury: Foot. Fantasy impact: Returned Wednesday after missing two practices; saw four carries in preseason opener. (Updated 2026-08-19)
+**Ashton Jeanty** (LV, RB) — Status: Uncertain for Week 1. Injury: Ankle (lower ankle sprain). Fantasy impact: This is actually a positive development for Jeanty, as there was certainly some concern over a longer-term injury when the second-year running back went down this past Sunday. This could certainly drop Jeanty down some fantasy draft boards a bit, but he should be rolling at full strength by the second or third week of the season at the latest.. (Updated 2026-08-25)
 
-**Alvin Kamara** (NO, RB) — Status: Out (1 month). Injury: Knee (sprained MCL). Fantasy impact: Expected sidelined approximately one month; ramp-up period anticipated upon return. (Updated 2026-08-19)
+**Jacory Croskey-Merritt** (WAS, RB) — Status: Limited in practice. Injury: Lower body injury. Fantasy impact: The running back was limited in practice on Monday with an undisclosed injury, and now we at least get clarification of a lower body injury. Which frankly is still a little vague. Fantasy managers will need to wait for more details on the exact extent of his injury, but if he's at least limited, it doesn't sound like it's anything too major.. (Updated 2026-08-25)
 
-**Jerome Ford** (WAS, RB) — Status: IR/Out for season. Injury: IR placement. Fantasy impact: Placed on injured reserve; out unless reaching injury settlement. (Updated 2026-08-18)
+**Trey Benson** (FA (waived by Arizona), RB) — Status: Waived/injured. Injury: Injured (unspecified). Fantasy impact: Benson would revert to the Cardinals IR list if he were to clear waivers. He had been at the end of the backfield's depth chart following the offseason additions of Jeremiyah Love and Tyler Allgeier.. (Updated 2026-08-24)
 
-**Jadarian Price** (SEA, RB) — Status: Active. Injury: Leg. Fantasy impact: Returned to full practice participation; expected ready for season start. (Updated 2026-08-18)
+**Rachaad White** (WAS, RB) — Status: Won't play Saturday preseason game. Injury: Hamstring. Fantasy impact: White is not going to be available to play in Saturday's preseason game. He is still dealing with a minor hamstring injury, but HC Dan Quinn told reporters that he is 'certainly close' to a return to the field. Jacory Croskey-Merritt stands to benefit if this injury causes the veteran to miss more time beyond this game.. (Updated 2026-08-20)
 
-**Christian McCaffrey** (SF, RB) — Status: Day-to-day. Injury: Minor. Fantasy impact: Skipped joint practice but would've participated otherwise; no contract concerns. (Updated 2026-08-18)
+**DJ Giddens** (IND, RB) — Status: Exits early Wednesday. Injury: Hamstring. Fantasy impact: Giddens was working his way back from a previous hamstring injury, so it appears he may have aggravated his previous injury.. (Updated 2026-08-19)
 
-**Jeremiyah Love** (ARI, RB) — Status: Day-to-day. Injury: Ankle (high sprain). Fantasy impact: Does not require surgery; hopeful for season start next month. (Updated 2026-08-18)
+**Tank Bigsby** (PHI, RB) — Status: Returns to practice Wednesday. Injury: Toe. Fantasy impact: Bigsby missed some practice time with the toe issue. He is slated to open the season backing up Saquon Barkley.. (Updated 2026-08-19)
 
-**Trey Benson** (ARI, RB) — Status: Day-to-day. Injury: Knee. Fantasy impact: Not yet ready for team activities but 'trending in the right direction'. (Updated 2026-08-18)
+**Tony Pollard** (TEN, RB) — Status: Returns to practice Wednesday. Injury: Foot. Fantasy impact: Pollard missed two practices with a foot issue. He saw four carries in the Titans preseason opener.. (Updated 2026-08-19)
 
-**Kaelon Black** (SF, RB) — Status: Active. Injury: Adductor. Fantasy impact: In uniform at practice for first time since early camp; positive sign for regular season. (Updated 2026-08-18)
+**Alvin Kamara** (NO, RB) — Status: Sidelined a month. Injury: Knee (sprained MCL). Fantasy impact: Kamara left Tuesday's practice with a knee injury, and now that the diagnosis has come in, expect him to start off the season slow. He'll likely have a ramp up period once he returns. While he is out, Devin Neal and Kendre Miller will fight for the primary backup spot behind Travis Etienne.. (Updated 2026-08-19)
 
-**Kyle Monangai** (CHI, RB) — Status: Week-to-week. Injury: Knee (hyperextended). Fantasy impact: Status requires continued monitoring heading into Week 1. (Updated 2026-08-18)
+**Jerome Ford** (WAS, RB) — Status: Placed on IR. Injury: Unspecified. Fantasy impact: Ford will be out for the season unless he reaches an injury settlement with Washington.. (Updated 2026-08-18)
 
-**Breece Hall** (NYJ, RB) — Status: Out (2-3 weeks). Injury: Groin. Fantasy impact: Missing next couple weeks; HC expects readiness for Week 1 despite injury. (Updated 2026-08-18)
+**Jadarian Price** (SEA, RB) — Status: Returns to practice. Injury: Leg. Fantasy impact: Price is continuing to be eased back into practice. He remains on track to be good to go for the start of the season. The question remains what his immediate role will be. He should be the lead back, at least on paper. We'll see if he gets any work in the Seahawks second preseason game.. (Updated 2026-08-18)
 
-**Josh Jacobs** (GB, RB) — Status: Active. Injury: Groin. Fantasy impact: Returned to practice Tuesday; solid RB1 workload bet if staying healthy. (Updated 2026-08-18)
+**Christian McCaffrey** (SF, RB) — Status: Would have practiced if not joint practice. Injury: Unspecified (day-to-day). Fantasy impact: Shanahan refuted the idea that McCaffrey isn't practicing because of a contract-related issue. McCaffrey remains day-to-day.. (Updated 2026-08-18)
 
-**LeQuint Allen Jr.** (JAC, RB) — Status: Out (camp). Injury: Soft tissue. Fantasy impact: Will not return to training camp; was competing for third-down role. (Updated 2026-08-18)
+**Jeremiyah Love** (ARI, RB) — Status: Will not require surgery. Injury: Ankle (high ankle sprain). Fantasy impact: Love is dealing with a high ankle sprain. He remains hopeful to be ready for the start of the season next month.. (Updated 2026-08-18)
 
-**Nicholas Singleton** (TEN, RB) — Status: Day-to-day. Injury: Unknown. Fantasy impact: Missed Monday and Saturday practices; competing for depth role as rookie. (Updated 2026-08-17)
+**Kaelon Black** (SF, RB) — Status: In uniform at practice Tuesday. Injury: Adductor. Fantasy impact: It is a positive sign for the Black. The rookie will have a chance to be good to go for the regular season opener.. (Updated 2026-08-18)
 
-**Terrell Jennings** (NE, RB) — Status: Released. Injury: IR. Fantasy impact: Released with injury settlement after IR placement. (Updated 2026-08-17)
+**Kyle Monangai** (CHI, RB) — Status: Week-to-week. Injury: Knee (hyperextended). Fantasy impact: Monangai was diagnosed with a hyperextended knee. His status will need to continue to be monitored as we get closer to Week 1.. (Updated 2026-08-18)
 
-**Kye Robichaux** (DET, RB) — Status: Waived. Injury: Injury. Fantasy impact: Waived with injury designation; will seek opportunity when cleared. (Updated 2026-08-17)
+**Breece Hall** (NYJ, RB) — Status: Out at least two weeks. Injury: Groin. Fantasy impact: Hall injured his groin during Monday's practice session, after which head coach Aaron Glenn expressed that the issue was not considered serious. It was announced Tuesday morning, however, that the Jets' workhorse back will miss at least the next couple of weeks. Glenn also reiterated that he expects Hall to be ready for Week 1.. (Updated 2026-08-18)
 
-**James Conner** (ARI, RB) — Status: Day-to-day. Injury: Ankle. Fantasy impact: No timeline for returning to 11-on-11 drills; role unclear behind other backs. (Updated 2026-08-16)
+**Josh Jacobs** (GB, RB) — Status: To return to practice Tuesday. Injury: Groin. Fantasy impact: Jacobs has been out the last few days due to injury, but it looks like he has recovered. Should he remain healthy, he's a solid bet for RB1 workload and production.. (Updated 2026-08-18)
 
-**Jeremy McNichols** (WAS, RB) — Status: Out (few weeks). Injury: Quad. Fantasy impact: Sidelined several weeks; competing for depth role in backfield. (Updated 2026-08-16)
+**LeQuint Allen Jr.** (JAC, RB) — Status: Will not return to camp. Injury: Soft tissue injury. Fantasy impact: Allen was looking like the primary third down back for the Jaguars, but this could derail how his season starts off. Missing the rest of camp isn't great even for a player in his second year in a system. However, this could be good news for Bhayshul Tuten truthers, as he could factor in more in the passing game should Allen's absence stretch into the regular season.. (Updated 2026-08-18)
 
-**Chuba Hubbard** (CAR, RB) — Status: Week-to-week. Injury: Hamstring. Fantasy impact: Expected to play Week 1 despite multi-week absence; may see limited snaps initially. (Updated 2026-08-13)
+**Nicholas Singleton** (TEN, RB) — Status: Not seen practicing Monday. Injury: Unspecified. Fantasy impact: Singleton also missed practice on Saturday. The rookie is competing for an immediate depth role in the Titans backfield. He saw eight carries in the preseason opener.. (Updated 2026-08-17)
 
-**Myles Montgomery** (NE, RB) — Status: Waived. Injury: Injury. Fantasy impact: Waived/injured by Patriots; will seek opportunity when cleared. (Updated 2026-08-13)
+**Terrell Jennings** (FA (released by Patriots), RB) — Status: Released with injury settlement. Injury: Unspecified. Fantasy impact: Jennings was previously placed on injured reserve by New England.. (Updated 2026-08-17)
+
+**Kye Robichaux** (FA (waived by Lions), RB) — Status: Waived with injury designation. Injury: Unspecified. Fantasy impact: Robichaux will figure to seek another opportunity when he is cleared. Detroit signed RB Trayveon Williams as the corresponding move.. (Updated 2026-08-17)
+
+**James Conner** (ARI, RB) — Status: Without timetable to return to team drills. Injury: Ankle. Fantasy impact: Conner took a paycut this offseason and is due $2.35 million guaranteed in 2026. It is unclear what his role will be when healthy behind Jeremiyah Love and Tyler Allgeier.. (Updated 2026-08-16)
+
+**Jeremy McNichols** (WAS, RB) — Status: To miss a few weeks. Injury: Quad. Fantasy impact: McNichols is competing for a depth role in the Commanders backfield.. (Updated 2026-08-16)

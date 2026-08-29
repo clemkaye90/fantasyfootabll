@@ -56,11 +56,15 @@ def render_comparison_table(
 
 
 def render_leaderboard_table(df: pd.DataFrame, schema: list[tuple[str, str, str | None]]) -> None:
-    """Render a full multi-row table (one row per player), sorted as given."""
+    """Render a full multi-row table (one row per player), sorted as given.
+
+    The Player column is pinned so it stays visible while scrolling right
+    through the rest of the stats.
+    """
     keys = [key for key, _, _ in schema]
     column_config = {
         key: (
-            st.column_config.TextColumn(label)
+            st.column_config.TextColumn(label, pinned=(key == "display_name"))
             if fmt is None
             else st.column_config.NumberColumn(label, format=fmt)
         )

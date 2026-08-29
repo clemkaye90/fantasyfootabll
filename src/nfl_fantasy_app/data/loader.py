@@ -22,6 +22,9 @@ OFFENSIVE_LINE_RANKINGS_DB = Path(__file__).parent / "offensive_line_rankings.db
 DRAFT_STRATEGY_ARTICLES_DB = Path(__file__).parent / "draft_strategy_articles.db"
 INJURY_REPORTS_DB = Path(__file__).parent / "injury_reports.db"
 PLAYER_NEWS_DB = Path(__file__).parent / "player_news.db"
+TOUCH_PROJECTIONS_DB = Path(__file__).parent / "touch_projections.db"
+WR_PROJECTIONS_DB = Path(__file__).parent / "wr_projections.db"
+COACH_SCHEMES_DB = Path(__file__).parent / "coach_schemes.db"
 
 PBP_COLUMNS = [
     "season_type", "game_id", "posteam", "defteam", "play_type",
@@ -170,3 +173,44 @@ def get_player_news_raw() -> pd.DataFrame:
         return pd.DataFrame()
     with sqlite3.connect(PLAYER_NEWS_DB) as conn:
         return pd.read_sql("SELECT * FROM player_news", conn)
+
+
+@st.cache_data(ttl=24 * 3600, show_spinner="Loading touch projections...")
+def get_touch_projections_raw() -> pd.DataFrame:
+    """Hand-built 2026 touch/workload projections (RB now, WR later), pre-
+    parsed into a bundled SQLite DB.
+
+    See scripts/ingest_touch_projections.py — the source .xlsx files live
+    outside the repo, so this DB is what actually ships/deploys.
+    """
+    if not TOUCH_PROJECTIONS_DB.exists():
+        return pd.DataFrame()
+    with sqlite3.connect(TOUCH_PROJECTIONS_DB) as conn:
+        return pd.read_sql("SELECT * FROM touch_projections", conn)
+
+
+@st.cache_data(ttl=24 * 3600, show_spinner="Loading WR projections...")
+def get_wr_projections_raw() -> pd.DataFrame:
+    """Hand-built 2026 WR target/workload projections, pre-parsed into a
+    bundled SQLite DB.
+
+    See scripts/ingest_wr_projections.py — the source .xlsx file lives
+    outside the repo, so this DB is what actually ships/deploys.
+    """
+    if not WR_PROJECTIONS_DB.exists():
+        return pd.DataFrame()
+    with sqlite3.connect(WR_PROJECTIONS_DB) as conn:
+        return pd.read_sql("SELECT * FROM wr_projections", conn)
+
+
+@st.cache_data(ttl=24 * 3600, show_spinner="Loading coach schemes...")
+def get_coach_schemes_raw() -> pd.DataFrame:
+    """Hand-built per-team play-caller/scheme benchmarks, pre-parsed into a
+    bundled SQLite DB.
+
+    See scripts/ingest_coach_schemes.py for sourcing.
+    """
+    if not COACH_SCHEMES_DB.exists():
+        return pd.DataFrame()
+    with sqlite3.connect(COACH_SCHEMES_DB) as conn:
+        return pd.read_sql("SELECT * FROM coach_schemes", conn)
