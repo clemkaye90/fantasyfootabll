@@ -3,7 +3,7 @@ title: QB Current Rankings
 source: nfl-fantasy-app blended projections (this app's own ranking pipeline)
 position: QB
 season: 2026
-as_of: 2026-08-20
+as_of: 2026-08-28
 authoritative_for: draft round / tier questions
 ---
 
@@ -15,11 +15,11 @@ This is this app's own blended ranking -- the average of whichever projection so
 
 **Lamar Jackson** (BAL, QB) — QB2, avg rank 2.5 (±1.0 rank spread across 4 sources). Projected 19.4 fantasy pts/game (37.3 rush yds/g, 0.0 rec yds/g, 0.0 rec/g, 1.93 TD/g).
 
-**Jayden Daniels** (WAS, QB) — QB3, avg rank 4.0 (±1.4 rank spread across 4 sources). Projected 19.0 fantasy pts/game (40.5 rush yds/g, 0.0 rec yds/g, 0.0 rec/g, 1.70 TD/g).
+**Jayden Daniels** (WAS, QB) — QB3, avg rank 3.8 (±1.5 rank spread across 4 sources). Projected 19.0 fantasy pts/game (40.6 rush yds/g, 0.0 rec yds/g, 0.0 rec/g, 1.70 TD/g).
 
-**Drake Maye** (NE, QB) — QB4, avg rank 5.0 (±3.4 rank spread across 4 sources). Projected 19.0 fantasy pts/game (29.0 rush yds/g, 0.0 rec yds/g, 0.0 rec/g, 1.86 TD/g).
+**Jalen Hurts** (PHI, QB) — QB4, avg rank 5.2 (±1.5 rank spread across 4 sources). Projected 18.9 fantasy pts/game (27.3 rush yds/g, 0.0 rec yds/g, 0.0 rec/g, 1.92 TD/g).
 
-**Jalen Hurts** (PHI, QB) — QB5, avg rank 5.5 (±1.3 rank spread across 4 sources). Projected 18.9 fantasy pts/game (27.3 rush yds/g, 0.0 rec yds/g, 0.0 rec/g, 1.92 TD/g).
+**Drake Maye** (NE, QB) — QB5, avg rank 5.5 (±3.1 rank spread across 4 sources). Projected 18.9 fantasy pts/game (29.0 rush yds/g, 0.0 rec yds/g, 0.0 rec/g, 1.85 TD/g).
 
 **Joe Burrow** (CIN, QB) — QB6, avg rank 7.0 (±3.7 rank spread across 4 sources). Projected 18.6 fantasy pts/game (10.2 rush yds/g, 0.0 rec yds/g, 0.0 rec/g, 2.06 TD/g).
 

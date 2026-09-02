@@ -8,11 +8,12 @@ from nfl_fantasy_app.data.touch_projections import build_touch_projections_table
 from nfl_fantasy_app.data.wr_projections import build_wr_projections_table
 from nfl_fantasy_app.ui.components import render_leaderboard_table
 
-# Fantasy Score is pulled out and placed right after Avg Rank (see
-# render_rankings_tab) rather than at the end of the breakdown, so it reads
-# next to the leaderboard's own rank column. Same column key/format for both
-# RB and WR -- each position tab joins its own projections table, so there's
-# no collision.
+# Fantasy Score plus its driver breakdown (RB_EXTRA_STATS / WR_EXTRA_STATS)
+# are all placed right after Avg Rank (see render_rankings_tab), so the
+# score and what's driving it read together instead of the drivers being
+# off at the far end of the table. Same column key/format for both RB and
+# WR -- each position tab joins its own projections table, so there's no
+# collision.
 FANTASY_SCORE_STAT = ("fantasy_score", "Fantasy Score", "%.1f")
 
 # RB-only extra columns from the hand-built 2026 touch/workload projections
@@ -25,9 +26,9 @@ RB_TOUCH_PROJECTION_COLUMNS = [
     "personnel_score", "fantasy_score",
 ]
 
-# The remaining attribute scores are shown in the same order they're
-# computed in the source spreadsheet (touches -> O-line -> wins -> injury
-# -> personnel), appended after the base leaderboard columns.
+# The remaining attribute scores (the drivers behind Fantasy Score) are
+# shown immediately beside it, in the same order they're computed in the
+# source spreadsheet (touches -> O-line -> wins -> injury -> personnel).
 RB_EXTRA_STATS = [
     ("carry_share_pct", "Carry Share", "percent"),
     ("target_share_pct", "Target Share", "percent"),
@@ -47,9 +48,9 @@ WR_TOUCH_PROJECTION_COLUMNS = [
     "targets_pg_score", "qb_blend_score", "injury_penalty", "fantasy_score",
 ]
 
-# Attribute scores in the order they're computed in the source spreadsheet
-# (target share -> targets/game -> QB blend -> injury), appended after the
-# base leaderboard columns.
+# The drivers behind Fantasy Score, shown immediately beside it, in the
+# order they're computed in the source spreadsheet (target share ->
+# targets/game -> QB blend -> injury).
 WR_EXTRA_STATS = [
     ("target_share_pct", "Target Share", "percent"),
     ("targets_pg", "Targets/G", "%.1f"),
@@ -90,8 +91,8 @@ def render_rankings_tab() -> None:
                 schema = (
                     schema[: avg_rank_idx + 1]
                     + [FANTASY_SCORE_STAT]
-                    + schema[avg_rank_idx + 1 :]
                     + extra_stats
+                    + schema[avg_rank_idx + 1 :]
                 )
 
             render_leaderboard_table(df, schema)

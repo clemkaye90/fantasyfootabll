@@ -1,3 +1,9 @@
+[server]
+# Auto-rerun the app whenever a source file is saved, instead of just
+# showing an in-browser "Source file changed" banner that needs a manual
+# click -- this is what was making it feel like a full restart was needed.
+runOnSave = true
+
 [theme]
 base = "light"
 primaryColor = "#013369"

@@ -23,11 +23,55 @@ from pathlib import Path
 
 from nfl_fantasy_app import config
 from nfl_fantasy_app.data.position_rankings import build_position_leaderboard
+from nfl_fantasy_app.data.touch_projections import build_touch_projections_table
+from nfl_fantasy_app.data.wr_projections import build_wr_projections_table
 
 OUT_DIR = Path(__file__).parent.parent / "corpus" / "current_rankings"
 
 # Same cutoffs as scripts/ingest_player_news.py's scope decision.
 CUTOFFS = {"QB": 20, "RB": 50, "WR": 75, "TE": 20}
+
+
+def _fmt(value, decimals=1) -> str:
+    """Sign-prefixed number for a score component, e.g. +4, -1, +0.5."""
+    return f"{value:+.{decimals}f}"
+
+
+def _fantasy_model_sentence(row) -> str | None:
+    """RB/WR only: the hand-built Fantasy Model Score and its component
+    breakdown, pulled from the same touch/target-projection tables that
+    back the Rankings tab's Fantasy Score column. Returns None for players
+    outside the projection sheets (not in the top 50 RBs / 100 WRs) or for
+    QB/TE, which have no Fantasy Model Score at all.
+    """
+    if "fantasy_score" not in row or row["fantasy_score"] != row["fantasy_score"]:  # NaN
+        return None
+
+    if row["position"] == "RB":
+        parts = [
+            f"Touches {_fmt(row['touches_score'], 0)}",
+            f"O-Line {_fmt(row['oline_score'])}",
+            f"Win {_fmt(row['win_score'])}",
+            f"Personnel {_fmt(row['personnel_score'])}",
+            f"Injury {_fmt(row['injury_penalty'], 0)}",
+        ]
+    elif row["position"] == "WR":
+        parts = [
+            f"Target Share {_fmt(row['target_share_score'], 0)}",
+            f"Targets/G {_fmt(row['targets_pg_score'], 0)}",
+            f"QB Blend {_fmt(row['qb_blend_score'], 0)}",
+            f"Injury {_fmt(row['injury_penalty'], 0)}",
+        ]
+    else:
+        return None
+
+    return (
+        f"Fantasy Model Score: {row['fantasy_score']:.1f} "
+        f"({', '.join(parts)}). This is this app's own hand-built scoring "
+        "model (distinct from the blended rank/fantasy-pts-per-game above), "
+        "weighted by real correlation research on what actually predicts "
+        f"{row['position']} output."
+    )
 
 
 def format_player(row) -> str:
@@ -40,13 +84,17 @@ def format_player(row) -> str:
         if row["rank_stdev"] != row["rank_stdev"]  # NaN check, single-source players
         else f"±{row['rank_stdev']:.1f} rank spread across {sources} sources"
     )
-    return (
+    sentence = (
         f"**{row['display_name']}** ({team}, {position}) — {row['label']}, "
         f"avg rank {row['avg_rank']:.1f} ({agreement}). "
         f"Projected {row['fantasy_points_pg']:.1f} fantasy pts/game "
         f"({row['rush_yards_pg']:.1f} rush yds/g, {row['rec_yards_pg']:.1f} rec yds/g, "
         f"{row['receptions_pg']:.1f} rec/g, {row['total_td_pg']:.2f} TD/g)."
     )
+    fantasy_model = _fantasy_model_sentence(row)
+    if fantasy_model:
+        sentence += f" {fantasy_model}"
+    return sentence
 
 
 def main() -> None:
@@ -55,12 +103,20 @@ def main() -> None:
     for existing in OUT_DIR.glob("*.md"):
         existing.unlink()
 
+    touch_projections = build_touch_projections_table()  # RB Fantasy Model Score
+    wr_projections = build_wr_projections_table()  # WR Fantasy Model Score
+
     total = 0
     for position, cutoff in CUTOFFS.items():
         board = build_position_leaderboard(position, season)
         if board.empty:
             print(f"{position}: EMPTY (no projection sources available -- check secrets/API key)")
             continue
+
+        if position == "RB" and not touch_projections.empty:
+            board = board.join(touch_projections.drop(columns=["position"]), how="left")
+        elif position == "WR" and not wr_projections.empty:
+            board = board.join(wr_projections.drop(columns=["position"]), how="left")
 
         top = board.head(cutoff).reset_index()
 

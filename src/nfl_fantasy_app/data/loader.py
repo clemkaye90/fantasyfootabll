@@ -27,7 +27,7 @@ WR_PROJECTIONS_DB = Path(__file__).parent / "wr_projections.db"
 COACH_SCHEMES_DB = Path(__file__).parent / "coach_schemes.db"
 
 PBP_COLUMNS = [
-    "season_type", "game_id", "posteam", "defteam", "play_type",
+    "season_type", "game_id", "week", "posteam", "defteam", "play_type",
     "pass_attempt", "rush_attempt", "complete_pass", "incomplete_pass",
     "passing_yards", "pass_touchdown", "interception",
     "passer_player_id", "passer_player_name",
