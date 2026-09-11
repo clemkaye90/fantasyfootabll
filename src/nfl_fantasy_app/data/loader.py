@@ -35,17 +35,21 @@ PBP_COLUMNS = [
     "receiving_yards", "receiver_player_id", "receiver_player_name", "yards_after_catch",
     "fumble_lost", "fumbled_1_player_id",
     "touchdown", "td_team", "field_goal_result",
+    "epa",
 ]
 
 
 @st.cache_data(ttl=6 * 3600, show_spinner="Loading play-by-play data...")
 def get_pbp(season: int) -> pd.DataFrame:
-    """Regular-season play-by-play for one season. Empty if not yet available."""
+    """Regular-season play-by-play for one season. Empty (but with
+    `PBP_COLUMNS` present, e.g. for a season with no games played yet) if
+    not yet available, so callers can safely reference those columns
+    without checking emptiness first."""
     df = nfl.import_pbp_data(
         [season], columns=PBP_COLUMNS, include_participation=False, downcast=True
     )
     if df.empty:
-        return df
+        return pd.DataFrame(columns=PBP_COLUMNS)
     return df[df["season_type"] == "REG"].copy()
 
 

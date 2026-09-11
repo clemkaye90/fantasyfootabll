@@ -25,6 +25,8 @@ click==8.4.2
     # via
     #   streamlit
     #   uvicorn
+cloudpickle==3.1.2
+    # via joblib
 colorama==0.4.6 ; sys_platform == 'win32'
     # via click
 cramjam==2.11.0
@@ -51,6 +53,8 @@ jinja2==3.1.6
     # via
     #   altair
     #   pydeck
+joblib==1.6.0
+    # via scikit-learn
 jsonschema==4.26.0
     # via altair
 jsonschema-specifications==2025.9.1
@@ -61,6 +65,7 @@ narwhals==2.24.0
     # via
     #   altair
     #   plotly
+    #   scikit-learn
 nfl-data-py==0.3.3
     # via nfl-fantasy-app
 numpy==1.26.4
@@ -69,6 +74,8 @@ numpy==1.26.4
     #   nfl-data-py
     #   pandas
     #   pydeck
+    #   scikit-learn
+    #   scipy
     #   streamlit
 packaging==26.3
     # via
@@ -105,11 +112,19 @@ referencing==0.37.0
     #   jsonschema
     #   jsonschema-specifications
 requests==2.34.2
-    # via streamlit
+    # via
+    #   nfl-fantasy-app
+    #   streamlit
 rpds-py==2026.6.3
     # via
     #   jsonschema
     #   referencing
+scikit-learn==1.9.0
+    # via nfl-fantasy-app
+scipy==1.17.1
+    # via
+    #   nfl-fantasy-app
+    #   scikit-learn
 six==1.17.0
     # via python-dateutil
 smmap==5.0.3
@@ -120,6 +135,8 @@ streamlit==1.59.1
     # via nfl-fantasy-app
 tenacity==9.1.4
     # via streamlit
+threadpoolctl==3.6.0
+    # via scikit-learn
 toml==0.10.2
     # via streamlit
 typing-extensions==4.16.0
@@ -129,6 +146,8 @@ typing-extensions==4.16.0
     #   referencing
     #   starlette
     #   streamlit
+tzdata==2026.3
+    # via nfl-fantasy-app
 urllib3==2.7.0
     # via requests
 uvicorn==0.52.1

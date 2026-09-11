@@ -16,3 +16,9 @@ wheels/
 # content, just .txt instead of .md for Lyzr's uploader. Not worth
 # duplicating in git history.
 corpus_txt/
+
+# Live, locally-growing state written by the scheduled
+# scripts/capture_spread_snapshot.py task -- unlike the other bundled
+# .db files, this isn't a curated snapshot meant to ship with the app.
+src/nfl_fantasy_app/data/spread_snapshots.db
+logs/

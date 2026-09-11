@@ -44,10 +44,10 @@ STATS_COLUMNS = [
     ("rush_yards_against", "Rushing Yds"),
     ("pass_td_against", "Passing TD"),
     ("rush_td_against", "Rushing TD"),
-    ("primary_rb", "Primary RB"),
-    ("primary_rb_yards", "Primary RB Yds"),
-    ("primary_wr", "Primary WR"),
-    ("primary_wr_yards", "Primary WR Yds"),
+    ("primary_rb", "Opp. Primary RB"),
+    ("primary_rb_yards", "Opp. Primary RB Yds"),
+    ("primary_wr", "Opp. Primary WR"),
+    ("primary_wr_yards", "Opp. Primary WR Yds"),
 ]
 
 # The first 5 non-Week/Team columns are OFFENSE, everything else is
@@ -228,6 +228,16 @@ def _render_stats_tab(team_abbr: str, season: int) -> None:
     _render_grouped_table(display, STATS_COLUMNS, STATS_GROUPS, average_row_idx=0)
 
 
+def _ats_record(weekly: pd.DataFrame) -> str:
+    """W-L-T against the spread so far this season, counted straight off
+    the same `spread_result` column the table below renders -- so the
+    record and the per-week results underneath it can never disagree."""
+    if "spread_result" not in weekly.columns:
+        return "0-0-0"
+    counts = weekly["spread_result"].value_counts()
+    return f"{counts.get('W', 0)}-{counts.get('L', 0)}-{counts.get('T', 0)}"
+
+
 def _render_gamble_tab(team_abbr: str, season: int) -> None:
     weekly = build_team_gambling_stats(team_abbr, season)
 
@@ -236,6 +246,8 @@ def _render_gamble_tab(team_abbr: str, season: int) -> None:
         weekly = pd.DataFrame(columns=keys)
     elif weekly["spread"].isna().all():
         st.caption(f"No {season} lines/results yet -- showing the full schedule.")
+
+    st.metric("Record Against the Spread", _ats_record(weekly))
 
     result_columns = {"spread_result", "total_result"}
     text_columns = {"week", "opponent"} | result_columns
