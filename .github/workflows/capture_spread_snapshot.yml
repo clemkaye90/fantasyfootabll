@@ -1,0 +1,48 @@
+name: Capture NFL spread snapshot
+
+# Runs scripts/capture_spread_snapshot.py daily and commits the updated
+# src/nfl_fantasy_app/data/spread_snapshots.db back to the repo. That
+# commit is what keeps the deployed Streamlit Cloud app's data current --
+# Streamlit Cloud has no persistent filesystem of its own and auto-
+# redeploys on every push to main, so this is the mechanism that gets
+# fresh opening/closing spreads (and, once games are played, the Season
+# tab's actual results) onto the live app without anyone visiting it.
+#
+# Daily, not weekly: "closing" snapshots are captured the day before each
+# specific game (Thursday/Sunday/Monday games each have their own
+# day-before moment), so a once-a-week run would miss most of them.
+#
+# 13:00 UTC is ~8-9am US Eastern depending on daylight saving; a couple
+# hours of drift across the DST transition doesn't matter here since the
+# script only needs to run once sometime before that day's games.
+
+on:
+  schedule:
+    - cron: "0 13 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Capture spread snapshot
+        run: uv run python scripts/capture_spread_snapshot.py
+
+      - name: Commit and push if the snapshot database changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/nfl_fantasy_app/data/spread_snapshots.db
+          git diff --cached --quiet || git commit -m "Daily spread snapshot capture"
+          git push

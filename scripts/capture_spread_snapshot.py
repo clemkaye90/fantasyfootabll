@@ -9,11 +9,22 @@ so re-running never overwrites an earlier reading, and a missed day just
 gets caught on the next run (as long as it's still before that game's
 opening/closing moment).
 
-Set up as a daily Windows Task Scheduler task:
+Runs on two independent daily schedules:
+- Locally, via a Windows Task Scheduler task ("NFL Spread Snapshot"),
+  keeping the local dev copy fresh for `streamlit run app.py`:
 
     schtasks /Create /SC DAILY /ST 08:00 /TN "NFL Spread Snapshot" ^
         /TR "\"<path to>\\.venv\\Scripts\\python.exe\" \"<path to>\\scripts\\capture_spread_snapshot.py\"" ^
         /F
+
+- In GitHub Actions (.github/workflows/capture_spread_snapshot.yml),
+  which commits the updated database back to the repo -- that push is
+  what keeps the deployed Streamlit Cloud app's data current, since it
+  has no persistent filesystem of its own. The local and cloud copies of
+  `spread_snapshots.db` are independent after that (each schedule inserts
+  into its own checkout), so don't expect them to always match exactly;
+  push a local capture manually if you want it on the deployed app sooner
+  than the next scheduled Actions run.
 
 Or run manually:
 

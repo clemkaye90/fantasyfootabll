@@ -17,8 +17,13 @@ wheels/
 # duplicating in git history.
 corpus_txt/
 
-# Live, locally-growing state written by the scheduled
-# scripts/capture_spread_snapshot.py task -- unlike the other bundled
-# .db files, this isn't a curated snapshot meant to ship with the app.
-src/nfl_fantasy_app/data/spread_snapshots.db
+# NOT ignored: src/nfl_fantasy_app/data/spread_snapshots.db. It used to be
+# treated as purely local, locally-growing state, but the deployed
+# Streamlit Cloud app has no persistent filesystem of its own -- so a
+# daily GitHub Actions job (.github/workflows/capture_spread_snapshot.yml)
+# now commits it back to the repo instead, and that commit is what keeps
+# the deployed app's spread data current. A local Task Scheduler run will
+# now show up as a normal tracked change too; commit and push it like any
+# other edit if you want a local capture to reach the deployed app sooner
+# than the next scheduled Action run.
 logs/
