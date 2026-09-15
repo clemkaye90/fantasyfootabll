@@ -68,33 +68,30 @@ def _week_games(season: int, week: int) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def _radio_key(pick_type: str, person: str, season: int, week: int, game_id: str) -> str:
-    return f"pick_{pick_type}_{person}_{season}_{week}_{game_id}"
+def _radio_key(pick_type: str, person: str, season: int, week: int, game_id: str, generation: int) -> str:
+    return f"pick_{pick_type}_{person}_{season}_{week}_{game_id}_{generation}"
 
 
 def _render_editable_view(person: str, season: int, week: int, pick_type: str, games: pd.DataFrame) -> None:
     saved = get_picks(season, week, pick_type)
     saved_for_person = saved[saved["person"] == person].set_index("game_id")["selected_team"].to_dict()
 
-    # Clearing has to delete each radio's session_state entry, then force a
-    # full fresh rerun with st.rerun() -- popping the keys and continuing on
-    # within the SAME run left some browsers still showing the old radio
-    # selection (Streamlit doesn't always repaint a radio's frontend
-    # component from a same-run state change; a genuinely new run does).
-    # `cleared_marker` carries the "ignore the DB-saved default" instruction
-    # across that rerun boundary -- otherwise, on the very next run, the
-    # `index=` fallback to `saved_for_person` below would instantly re-seed
-    # the freshly-cleared widgets right back to what was last saved. It's
-    # popped (not just read) so it only suppresses the default for that one
-    # post-clear run; every run after that, each radio's own (now-None)
-    # session_state entry takes over on its own.
-    cleared_marker = f"cleared_marker_{pick_type}_{person}_{season}_{week}"
+    # Clearing works by bumping `generation` into every radio's key, rather
+    # than deleting the old key's session_state entry -- deleting and
+    # recreating a widget under the SAME key depends on exactly when
+    # Streamlit/the browser decide to repaint it, and that didn't reliably
+    # clear the radios in practice. A never-before-seen key can't carry any
+    # stale value: Streamlit has no session_state for it yet (so it's
+    # unselected by construction) and the browser has to mount a whole new
+    # component for it rather than patch an existing one. `generation`
+    # itself lives in session_state so it survives the rerun the button
+    # click triggers, and once bumped, it also stops the `index=` fallback
+    # below from re-seeding the new widgets with the database-saved pick.
+    generation_key = f"pick_generation_{pick_type}_{person}_{season}_{week}"
+    generation = st.session_state.get(generation_key, 0)
     if st.button("Clear all picks", key=f"clear_{pick_type}_{person}_{season}_{week}"):
-        for game_id in games["game_id"]:
-            st.session_state.pop(_radio_key(pick_type, person, season, week, game_id), None)
-        st.session_state[cleared_marker] = True
-        st.rerun()
-    just_cleared = st.session_state.pop(cleared_marker, False)
+        generation += 1
+        st.session_state[generation_key] = generation
 
     # One radio widget per game, with the game + spread folded into its
     # own label, rather than a Game/Spread/Picker column layout -- Streamlit
@@ -104,12 +101,12 @@ def _render_editable_view(person: str, season: int, week: int, pick_type: str, g
     selections: dict[str, str] = {}
     for _, game in games.iterrows():
         options = [game["home_team"], game["away_team"]]
-        saved_pick = None if just_cleared else saved_for_person.get(game["game_id"])
+        saved_pick = None if generation > 0 else saved_for_person.get(game["game_id"])
         index = options.index(saved_pick) if saved_pick in options else None
         pick = st.radio(
             f"{game['away_team']} @ {game['home_team']}  ({game['opening_spread']})",
             options=options, index=index, horizontal=True,
-            key=_radio_key(pick_type, person, season, week, game["game_id"]),
+            key=_radio_key(pick_type, person, season, week, game["game_id"], generation),
         )
         if pick is not None:
             selections[game["game_id"]] = pick
