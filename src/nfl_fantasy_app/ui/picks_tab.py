@@ -76,20 +76,25 @@ def _render_editable_view(person: str, season: int, week: int, pick_type: str, g
     saved = get_picks(season, week, pick_type)
     saved_for_person = saved[saved["person"] == person].set_index("game_id")["selected_team"].to_dict()
 
-    # Clearing has to delete each radio's session_state entry BEFORE that
-    # radio is instantiated further down in this same run -- Streamlit only
-    # applies `index=` when a widget's key has no existing state, so
-    # deleting it here is what makes them come back unselected. `just_cleared`
-    # also has to suppress the DB-saved value below for this one run only:
-    # otherwise the `index=` fallback to `saved_for_person` would instantly
-    # re-seed the freshly-cleared widget right back to what was last saved.
-    # Every run after this one, each radio's own (now-None) session_state
-    # entry takes over automatically, so no persistent "cleared" flag is
-    # needed beyond this single render.
-    just_cleared = st.button("Clear all picks", key=f"clear_{pick_type}_{person}_{season}_{week}")
-    if just_cleared:
+    # Clearing has to delete each radio's session_state entry, then force a
+    # full fresh rerun with st.rerun() -- popping the keys and continuing on
+    # within the SAME run left some browsers still showing the old radio
+    # selection (Streamlit doesn't always repaint a radio's frontend
+    # component from a same-run state change; a genuinely new run does).
+    # `cleared_marker` carries the "ignore the DB-saved default" instruction
+    # across that rerun boundary -- otherwise, on the very next run, the
+    # `index=` fallback to `saved_for_person` below would instantly re-seed
+    # the freshly-cleared widgets right back to what was last saved. It's
+    # popped (not just read) so it only suppresses the default for that one
+    # post-clear run; every run after that, each radio's own (now-None)
+    # session_state entry takes over on its own.
+    cleared_marker = f"cleared_marker_{pick_type}_{person}_{season}_{week}"
+    if st.button("Clear all picks", key=f"clear_{pick_type}_{person}_{season}_{week}"):
         for game_id in games["game_id"]:
             st.session_state.pop(_radio_key(pick_type, person, season, week, game_id), None)
+        st.session_state[cleared_marker] = True
+        st.rerun()
+    just_cleared = st.session_state.pop(cleared_marker, False)
 
     # One radio widget per game, with the game + spread folded into its
     # own label, rather than a Game/Spread/Picker column layout -- Streamlit
