@@ -5,10 +5,14 @@ CURRENT_SEASON = 2026
 
 MODE_BASELINE = "baseline"
 MODE_CURRENT = "current"
+MODE_BACKTEST = "backtest"
+MODE_PICKS = "picks"
 
 MODE_LABELS = {
     MODE_BASELINE: f"{BASELINE_SEASON} Season (Baseline)",
     MODE_CURRENT: f"{CURRENT_SEASON} Season (Live)",
+    MODE_BACKTEST: f"{BASELINE_SEASON} Prediction Back Test",
+    MODE_PICKS: "Picks",
 }
 
 def season_for_mode(mode: str) -> int:

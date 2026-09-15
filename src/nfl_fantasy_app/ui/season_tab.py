@@ -11,20 +11,9 @@ import streamlit as st
 from nfl_fantasy_app import config
 from nfl_fantasy_app.data.loader import get_schedules
 from nfl_fantasy_app.models.live_predictions import build_week_predictions
-from nfl_fantasy_app.ui.components import HIGHLIGHT_STYLE
+from nfl_fantasy_app.ui.components import highlight_ats_match, sort_predictions_by_confidence
 
 REGULAR_SEASON_WEEKS = 18
-
-
-def _highlight_ats_match(row: pd.Series) -> list[str]:
-    """Green-highlight Actual Winner + Winner ATS when they agree (the
-    straight-up winner also covered the spread) -- skip N/A/TIE so two
-    blank cells on an unplayed game don't highlight as a false match."""
-    styles = [""] * len(row)
-    if row["Actual Winner"] not in ("N/A", "TIE") and row["Actual Winner"] == row["Winner ATS"]:
-        styles[row.index.get_loc("Actual Winner")] = HIGHLIGHT_STYLE
-        styles[row.index.get_loc("Winner ATS")] = HIGHLIGHT_STYLE
-    return styles
 
 
 def _current_week(schedule: pd.DataFrame) -> int:
@@ -58,8 +47,9 @@ def render_season_tab() -> None:
         st.info(f"No schedule released yet for Week {week}.")
         return
 
+    predictions = sort_predictions_by_confidence(predictions)
     st.dataframe(
-        predictions.style.apply(_highlight_ats_match, axis=1),
+        predictions.style.apply(highlight_ats_match, axis=1),
         hide_index=True,
         width="stretch",
         column_config={
