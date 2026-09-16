@@ -17,13 +17,23 @@ st.set_page_config(page_title="NFL Fantasy Stats", page_icon="🏈", layout="wid
 
 st.title("🏈 NFL Fantasy Stats")
 
-# MODE_BASELINE (2025 Season (Baseline)) and MODE_BACKTEST (2025 Prediction
-# Back Test) are intentionally left out of `options` -- no longer needed
-# day to day, but kept in `config` rather than deleted in case they're
-# wanted again.
+# MODE_BASELINE (2025 Season (Baseline)) is intentionally left out of
+# `options` -- no longer needed day to day, but kept in `config` rather
+# than deleted in case it's wanted again.
+mode_options = [config.MODE_PICKS, config.MODE_CURRENT]
+
+# MODE_BACKTEST (2025 Prediction Back Test) is local-only: it's a dev/
+# research tool, not something worth showing the group on the deployed
+# app. `is_local` is a flag set in the local (gitignored) secrets.toml
+# only -- deliberately never pasted into Streamlit Cloud's Settings ->
+# Secrets -- so the deployed app naturally never sees it and this stays
+# off there without any separate environment-detection logic.
+if st.secrets.get("is_local", False):
+    mode_options.append(config.MODE_BACKTEST)
+
 mode_label = st.radio(
     "Data mode",
-    options=[config.MODE_PICKS, config.MODE_CURRENT],
+    options=mode_options,
     format_func=lambda m: config.MODE_LABELS[m],
     horizontal=True,
     index=0,  # default to Picks on every fresh load
