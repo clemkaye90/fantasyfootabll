@@ -17,12 +17,13 @@ st.set_page_config(page_title="NFL Fantasy Stats", page_icon="🏈", layout="wid
 
 st.title("🏈 NFL Fantasy Stats")
 
-# MODE_BASELINE (2025 Season (Baseline)) is intentionally left out of
-# `options` -- no longer needed day to day, but kept in `config` rather
-# than deleted in case it's wanted again.
+# MODE_BASELINE (2025 Season (Baseline)) and MODE_BACKTEST (2025 Prediction
+# Back Test) are intentionally left out of `options` -- no longer needed
+# day to day, but kept in `config` rather than deleted in case they're
+# wanted again.
 mode_label = st.radio(
     "Data mode",
-    options=[config.MODE_PICKS, config.MODE_CURRENT, config.MODE_BACKTEST],
+    options=[config.MODE_PICKS, config.MODE_CURRENT],
     format_func=lambda m: config.MODE_LABELS[m],
     horizontal=True,
     index=0,  # default to Picks on every fresh load
