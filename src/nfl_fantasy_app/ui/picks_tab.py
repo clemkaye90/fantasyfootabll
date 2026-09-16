@@ -177,8 +177,14 @@ def render_picks_tab() -> None:
         default_index = weeks.index(_default_week(schedule)) if weeks else 0
 
     selector_cols = st.columns(2)
-    person = selector_cols[0].selectbox("Who's picking?", options=PEOPLE + [ALL_OPTION])
+    person = selector_cols[0].selectbox(
+        "Who's picking?", options=PEOPLE + [ALL_OPTION], index=None, placeholder="Select a person..."
+    )
     week = selector_cols[1].selectbox("Week", options=weeks, index=default_index, format_func=lambda w: f"Week {w}")
+
+    if person is None:
+        st.info("Select who's picking above to see or make picks.")
+        return
 
     games = _week_games(season, week)
     pick_em_tab, spread_tab = st.tabs(["Pick Em", "Spread"])
