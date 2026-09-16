@@ -1,64 +1,83 @@
 """Persisted picks for the weekly Picks pool -- each of the five people in
 `ui.picks_tab.PEOPLE` chooses a winner for every game (Pick Em) or for up
-to 5 games (Spread), and those choices need to survive across app
-restarts/deploys, not just live in a Streamlit widget's in-session state.
+to 5 games (Spread).
+
+Stored in a Google Sheet rather than a local SQLite file: Streamlit
+Community Cloud's filesystem is ephemeral, so anything saved locally there
+(via a user clicking Save in the running app, as opposed to something
+committed to git like the other bundled .db files) would vanish the next
+time the app restarts or redeploys. See `.streamlit/secrets.toml.example`
+for the one-time Google Cloud service account + spreadsheet-sharing setup
+this needs.
 """
 
-import sqlite3
 from datetime import datetime, timezone
-from pathlib import Path
 
 import pandas as pd
 import streamlit as st
-
-PICKS_DB = Path(__file__).parent / "picks.db"
+from streamlit_gsheets import GSheetsConnection
 
 PICK_TYPES = ("pick_em", "spread")
+WORKSHEET = "picks"
+COLUMNS = ["person", "season", "week", "pick_type", "game_id", "selected_team", "saved_at"]
 
 
-def _connect() -> sqlite3.Connection:
-    conn = sqlite3.connect(PICKS_DB)
-    conn.execute(
-        """
-        CREATE TABLE IF NOT EXISTS picks (
-            person TEXT NOT NULL,
-            season INTEGER NOT NULL,
-            week INTEGER NOT NULL,
-            pick_type TEXT NOT NULL,
-            game_id TEXT NOT NULL,
-            selected_team TEXT NOT NULL,
-            saved_at TEXT NOT NULL,
-            PRIMARY KEY (person, season, week, pick_type, game_id)
-        )
-        """
-    )
-    return conn
+def _connection() -> GSheetsConnection:
+    return st.connection("gsheets", type=GSheetsConnection)
+
+
+def _read_all() -> pd.DataFrame:
+    """Every saved pick, across every person/season/week/pick_type --
+    `save_picks`/`get_picks` both filter this down further. `ttl=0`
+    bypasses the connector's own internal read cache so staleness is
+    controlled entirely by `get_picks`'s `st.cache_data` wrapper, rather
+    than stacking two caches with different invalidation timing."""
+    df = _connection().read(worksheet=WORKSHEET, ttl=0)
+    if df.empty:
+        return pd.DataFrame(columns=COLUMNS)
+    df = df.dropna(how="all")
+    df["season"] = pd.to_numeric(df["season"], errors="coerce").astype("Int64")
+    df["week"] = pd.to_numeric(df["week"], errors="coerce").astype("Int64")
+    return df[COLUMNS]
 
 
 def save_picks(person: str, season: int, week: int, pick_type: str, selections: dict[str, str]) -> None:
     """Replace `person`'s `pick_type` picks for `season`/`week` with
-    `selections` ({game_id: selected_team}) -- a full delete-then-insert
-    rather than an upsert per row, so un-picking a game (leaving its radio
-    unselected) actually clears any previously saved pick for it instead
-    of leaving stale data behind."""
+    `selections` ({game_id: selected_team}): read the whole sheet, drop
+    this person/week/pick_type's old rows, add the new ones, write the
+    whole sheet back. A full delete-then-insert rather than a per-row
+    upsert, so un-picking a game (leaving its radio unselected) actually
+    clears any previously saved pick for it instead of leaving stale data
+    behind -- and a whole-sheet rewrite is the natural fit anyway, since
+    Google Sheets has no row-level update primitive to speak of. Fine for
+    this pool's scale (5 people, a handful of saves a week); two saves
+    landing in the same instant could in principle race and one could
+    clobber the other's read, but that's an acceptable trade for a free,
+    zero-maintenance backing store here.
+    """
     if pick_type not in PICK_TYPES:
         raise ValueError(f"pick_type must be one of {PICK_TYPES}, got {pick_type!r}")
+
+    existing = _read_all()
+    keep = existing[
+        ~(
+            (existing["person"] == person) & (existing["season"] == season)
+            & (existing["week"] == week) & (existing["pick_type"] == pick_type)
+        )
+    ]
     saved_at = datetime.now(timezone.utc).isoformat()
-    with _connect() as conn:
-        conn.execute(
-            "DELETE FROM picks WHERE person = ? AND season = ? AND week = ? AND pick_type = ?",
-            (person, int(season), int(week), pick_type),
-        )
-        conn.executemany(
-            """
-            INSERT INTO picks (person, season, week, pick_type, game_id, selected_team, saved_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-            """,
-            [
-                (person, int(season), int(week), pick_type, game_id, team, saved_at)
-                for game_id, team in selections.items()
-            ],
-        )
+    new_rows = pd.DataFrame(
+        [
+            {
+                "person": person, "season": season, "week": week, "pick_type": pick_type,
+                "game_id": game_id, "selected_team": team, "saved_at": saved_at,
+            }
+            for game_id, team in selections.items()
+        ],
+        columns=COLUMNS,
+    )
+    updated = pd.concat([keep, new_rows], ignore_index=True)
+    _connection().update(worksheet=WORKSHEET, data=updated)
     get_picks.clear()
 
 
@@ -68,10 +87,8 @@ def get_picks(season: int, week: int, pick_type: str) -> pd.DataFrame:
     for every pick saved so far in this season/week/pick_type -- across
     all 5 people, so both a single person's editable view and the ALL
     majority view are built from the same query."""
-    if not PICKS_DB.exists():
+    df = _read_all()
+    if df.empty:
         return pd.DataFrame(columns=["person", "game_id", "selected_team"])
-    with sqlite3.connect(PICKS_DB) as conn:
-        return pd.read_sql(
-            "SELECT person, game_id, selected_team FROM picks WHERE season = ? AND week = ? AND pick_type = ?",
-            conn, params=(int(season), int(week), pick_type),
-        )
+    matched = df[(df["season"] == season) & (df["week"] == week) & (df["pick_type"] == pick_type)]
+    return matched[["person", "game_id", "selected_team"]].reset_index(drop=True)

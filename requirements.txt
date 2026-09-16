@@ -19,6 +19,8 @@ cachetools==7.1.7
     # via streamlit
 certifi==2026.7.22
     # via requests
+cffi==2.1.1 ; platform_python_implementation != 'PyPy'
+    # via cryptography
 charset-normalizer==3.5.0
     # via requests
 click==8.4.2
@@ -31,6 +33,12 @@ colorama==0.4.6 ; sys_platform == 'win32'
     # via click
 cramjam==2.11.0
     # via fastparquet
+cryptography==50.0.1
+    # via google-auth
+decorator==5.3.1
+    # via gspread-pandas
+duckdb==1.5.5
+    # via st-gsheets-connection
 fastparquet==2026.5.0
     # via nfl-data-py
 fsspec==2026.7.0
@@ -39,6 +47,27 @@ gitdb==4.0.12
     # via gitpython
 gitpython==3.1.59
     # via streamlit
+google-auth==2.58.0
+    # via
+    #   google-auth-oauthlib
+    #   gspread
+    #   gspread-pandas
+google-auth-oauthlib==1.4.1
+    # via
+    #   gspread
+    #   gspread-pandas
+gspread==5.12.4
+    # via
+    #   gspread-dataframe
+    #   gspread-formatting
+    #   gspread-pandas
+    #   st-gsheets-connection
+gspread-dataframe==4.0.0
+    # via st-gsheets-connection
+gspread-formatting==1.2.1
+    # via st-gsheets-connection
+gspread-pandas==3.3.0
+    # via st-gsheets-connection
 h11==0.16.0
     # via uvicorn
 httptools==0.8.0
@@ -77,6 +106,8 @@ numpy==1.26.4
     #   scikit-learn
     #   scipy
     #   streamlit
+oauthlib==3.3.1
+    # via requests-oauthlib
 packaging==26.3
     # via
     #   altair
@@ -86,6 +117,8 @@ packaging==26.3
 pandas==1.5.3
     # via
     #   fastparquet
+    #   gspread-dataframe
+    #   gspread-pandas
     #   nfl-data-py
     #   nfl-fantasy-app
     #   streamlit
@@ -99,6 +132,12 @@ pyarrow==25.0.1
     # via
     #   nfl-fantasy-app
     #   streamlit
+pyasn1==0.6.4
+    # via pyasn1-modules
+pyasn1-modules==0.4.2
+    # via google-auth
+pycparser==3.0 ; implementation_name != 'PyPy' and platform_python_implementation != 'PyPy'
+    # via cffi
 pydeck==0.9.3
     # via streamlit
 python-dateutil==2.9.0.post0
@@ -114,7 +153,10 @@ referencing==0.37.0
 requests==2.34.2
     # via
     #   nfl-fantasy-app
+    #   requests-oauthlib
     #   streamlit
+requests-oauthlib==2.0.0
+    # via google-auth-oauthlib
 rpds-py==2026.6.3
     # via
     #   jsonschema
@@ -126,13 +168,23 @@ scipy==1.17.1
     #   nfl-fantasy-app
     #   scikit-learn
 six==1.17.0
-    # via python-dateutil
+    # via
+    #   gspread-dataframe
+    #   python-dateutil
 smmap==5.0.3
     # via gitdb
+sql-metadata==3.0.1
+    # via st-gsheets-connection
+sqlglot==30.18.0
+    # via sql-metadata
+st-gsheets-connection==0.1.0
+    # via nfl-fantasy-app
 starlette==1.6.0
     # via streamlit
 streamlit==1.59.1
-    # via nfl-fantasy-app
+    # via
+    #   nfl-fantasy-app
+    #   st-gsheets-connection
 tenacity==9.1.4
     # via streamlit
 threadpoolctl==3.6.0
@@ -152,6 +204,8 @@ urllib3==2.7.0
     # via requests
 uvicorn==0.52.1
     # via streamlit
+validators==0.35.0
+    # via st-gsheets-connection
 watchdog==6.0.0 ; sys_platform != 'darwin'
     # via streamlit
 websockets==17.0.1
