@@ -56,7 +56,8 @@ STATS_COLUMNS = [
 # "For"/"Against" is dropped from the labels above since the OFFENSE/
 # DEFENSE group header already disambiguates which "Points"/"Yds" is which.
 STATS_GROUPS = [("OFFENSE", 5), ("DEFENSE", len(STATS_COLUMNS) - 2 - 5)]
-PINNED_COLUMN_WIDTH_PCT = 6  # Week and Team share this width each
+PINNED_COL_WIDTH_PX = 70  # Week and Team each get this width
+OTHER_COL_WIDTH_PX = 100  # every other Stats column gets this width
 
 GAMBLE_COLUMNS = [
     ("week", "Week"),
@@ -149,14 +150,18 @@ def _render_grouped_table(
     dataframe widget -- the tradeoff is losing built-in sorting/scrolling
     polish in exchange for the merged-cell layout the grouping needs.
 
-    Every column past the first two (Week, Team) shares one equal width;
-    headers wrap onto a second line when their label doesn't fit.
+    Each column gets a fixed, comfortably-readable width (rather than all
+    columns squeezed to fit 100% of the viewport), and the table sits in
+    its own horizontally-scrolling container -- on a phone-width screen
+    that's what lets you scroll sideways to read it at a normal size,
+    matching every other tab's st.dataframe, instead of `table-layout:
+    fixed` cramming 16 columns into one screen with unreadably small text.
     """
     keys = [key for key, _ in columns]
-    other_width = (100 - 2 * PINNED_COLUMN_WIDTH_PCT) / (len(keys) - 2)
+    total_width_px = 2 * PINNED_COL_WIDTH_PX + (len(keys) - 2) * OTHER_COL_WIDTH_PX
 
-    colgroup = f'<col style="width:{PINNED_COLUMN_WIDTH_PCT}%">' * 2
-    colgroup += f'<col style="width:{other_width}%">' * (len(keys) - 2)
+    colgroup = f'<col style="width:{PINNED_COL_WIDTH_PX}px">' * 2
+    colgroup += f'<col style="width:{OTHER_COL_WIDTH_PX}px">' * (len(keys) - 2)
 
     # Week/Team span both header rows (no group applies to them); the rest
     # of the top row is the OFFENSE/DEFENSE merged cells.
@@ -177,16 +182,18 @@ def _render_grouped_table(
     st.markdown(
         f"""
         <style>
-        .live-team-table {{ width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 0.82rem; }}
+        .live-team-table-scroll {{ overflow-x: auto; -webkit-overflow-scrolling: touch; }}
+        .live-team-table {{ width: {total_width_px}px; border-collapse: collapse; table-layout: fixed; font-size: 1rem; }}
         .live-team-table th, .live-team-table td {{
-            border: 1px solid #d0d7de; padding: 4px 5px; text-align: center;
-            white-space: normal; overflow-wrap: break-word; line-height: 1.2;
+            border: 1px solid #d0d7de; padding: 6px 8px; text-align: center;
+            white-space: normal; overflow-wrap: break-word; line-height: 1.3;
         }}
         .live-team-table thead th {{ background-color: #f0f2f6; font-weight: 600; }}
         .live-team-table th.group-offense {{ background-color: #dbe7f5; }}
         .live-team-table th.group-defense {{ background-color: #f5dbdb; }}
         .live-team-table tr.average-row td {{ background-color: #fff8e1; font-weight: 600; }}
         </style>
+        <div class="live-team-table-scroll">
         <table class="live-team-table">
           <colgroup>{colgroup}</colgroup>
           <thead>
@@ -195,6 +202,7 @@ def _render_grouped_table(
           </thead>
           <tbody>{"".join(body_rows)}</tbody>
         </table>
+        </div>
         """,
         unsafe_allow_html=True,
     )
