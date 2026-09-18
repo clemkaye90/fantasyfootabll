@@ -24,10 +24,17 @@ PICK_TYPE_LABELS = {"pick_em": "Pick Em", "spread": "Spread"}
 
 
 def _default_week(schedule: pd.DataFrame) -> int:
-    """Same "earliest unplayed week" definition the live Season tab uses,
-    just as this week's starting point -- the week dropdown itself still
-    lets you pick any week to fill out picks ahead of time or review a
-    past one."""
+    """The week dropdown's default: the earliest week that still has a
+    game today or later. Since every NFL week's last game is a Monday
+    nighter, this rolls over to the next week on Tuesday, not whenever
+    that Monday game happens to finish -- e.g. Week 2's last game is
+    Monday 2026-09-21, so this returns 2 through that Monday and 3 from
+    Tuesday 2026-09-22 on (and 4 from Tuesday 2026-09-29), matching every
+    Tuesday's reset rather than needing a separate day-of-week check. The
+    week dropdown itself still lets you pick any week to fill out picks
+    ahead of time or review a past one -- this is only the starting point.
+    Same definition the live Season tab's `_current_week` uses.
+    """
     upcoming = schedule[schedule["gameday"].dt.date >= date.today()]
     if upcoming.empty:
         return int(schedule["week"].max())
