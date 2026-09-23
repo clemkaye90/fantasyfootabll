@@ -57,12 +57,14 @@ WEEK_GAMES_COLUMNS = [
 ]
 
 
+@st.cache_data(ttl=15 * 60, show_spinner=False)
 def _week_games(season: int, week: int) -> pd.DataFrame:
     """One row per game in `season`/`week`: matchup, the opening spread
     snapshot (both formatted for display and as a raw number for grading),
     and the actual score once played (NaN until then) -- the raw material
     for the editable Pick Em/Spread tables, the ALL majority view, and
-    `_render_week_results`' grading."""
+    `_render_week_results`' grading. Cached: the cumulative record below
+    calls this once per week up through the one selected, every rerun."""
     schedule = get_schedules(season)
     schedule = schedule[(schedule["game_type"] == "REG") & (schedule["week"] == week)] if not schedule.empty else schedule
     if schedule.empty:
@@ -194,13 +196,42 @@ def _grade_pick(pick_type: str, picked_team: str, game: pd.Series) -> bool | Non
     return picked_team == covered
 
 
+def _week_record_totals(season: int, week: int, pick_type: str) -> dict[str, list[int]]:
+    """Each person's correct-incorrect count for one week only -- the
+    building block the cumulative record below sums across every week
+    from 2 through the one selected (Week 1 is never picked, see
+    `render_picks_tab`'s week selector)."""
+    games = _week_games(season, week)
+    totals = {person: [0, 0] for person in PEOPLE}
+    if games.empty:
+        return totals
+    saved = get_picks(season, week, pick_type)
+    if saved.empty:
+        return totals
+    for _, game in games.iterrows():
+        if pd.isna(game["home_score"]) or pd.isna(game["away_score"]):
+            continue
+        picks_for_game = saved[saved["game_id"] == game["game_id"]].set_index("person")["selected_team"]
+        for person in PEOPLE:
+            pick = picks_for_game.get(person)
+            if not pick:
+                continue
+            correct = _grade_pick(pick_type, pick, game)
+            if correct is True:
+                totals[person][0] += 1
+            elif correct is False:
+                totals[person][1] += 1
+    return totals
+
+
 def _render_week_results(season: int, week: int, pick_type: str, games: pd.DataFrame) -> None:
     """Below the picks themselves, once at least one of this week's games
-    has a final score: a Game x Person grid of everyone's picks (blank if
-    they didn't pick that game), correct picks highlighted green, plus
-    each person's correct-incorrect record for the week so far -- games
-    with no final score yet, or that graded as a push/tie, count toward
-    neither side of anyone's record."""
+    has a final score: a Game x Person grid of everyone's picks for THIS
+    week (blank if they didn't pick that game), correct ones highlighted
+    green, plus each person's CUMULATIVE correct-incorrect record through
+    this week -- e.g. viewing Week 3 adds Week 3's results on top of Week
+    2's, not just Week 3 alone. Games with no final score yet, or that
+    graded as a push/tie, count toward neither side of anyone's record."""
     saved = get_picks(season, week, pick_type)
     graded_games = games.dropna(subset=["home_score", "away_score"])
     if saved.empty or graded_games.empty:
@@ -208,21 +239,14 @@ def _render_week_results(season: int, week: int, pick_type: str, games: pd.DataF
 
     rows = []
     correctness: dict[tuple[int, str], bool | None] = {}
-    records = {person: [0, 0] for person in PEOPLE}
     for row_idx, (_, game) in enumerate(games.iterrows()):
         picks_for_game = saved[saved["game_id"] == game["game_id"]].set_index("person")["selected_team"]
         row = {"Game": f"{game['away_team']} @ {game['home_team']}"}
         for person in PEOPLE:
             pick = picks_for_game.get(person)
             row[person] = pick if pick else ""
-            if not pick:
-                continue
-            correct = _grade_pick(pick_type, pick, game)
-            correctness[(row_idx, person)] = correct
-            if correct is True:
-                records[person][0] += 1
-            elif correct is False:
-                records[person][1] += 1
+            if pick:
+                correctness[(row_idx, person)] = _grade_pick(pick_type, pick, game)
         rows.append(row)
 
     def highlight(row: pd.Series) -> list[str]:
@@ -236,12 +260,23 @@ def _render_week_results(season: int, week: int, pick_type: str, games: pd.DataF
     st.dataframe(
         pd.DataFrame(rows).style.apply(highlight, axis=1), hide_index=True, width="stretch",
     )
+
+    cumulative = {person: [0, 0] for person in PEOPLE}
+    for wk in range(2, week + 1):
+        wk_totals = _week_record_totals(season, wk, pick_type)
+        for person in PEOPLE:
+            cumulative[person][0] += wk_totals[person][0]
+            cumulative[person][1] += wk_totals[person][1]
+
     st.dataframe(
-        pd.DataFrame([{person: f"{c}-{i}" for person, (c, i) in records.items()}], index=["Record"]),
+        pd.DataFrame(
+            [{person: f"{c}-{i}" for person, (c, i) in cumulative.items()}],
+            index=[f"Record (through Week {week})"],
+        ),
         width="stretch",
     )
     st.caption(
-        "Record is correct-incorrect for games graded so far this week -- an unpicked, unplayed, or "
+        f"Record is cumulative correct-incorrect through Week {week} -- an unpicked, unplayed, or "
         "pushed/tied game counts toward neither side."
     )
 
